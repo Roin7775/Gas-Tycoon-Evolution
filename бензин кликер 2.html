@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Tycoon Ultimate: Financial Empire</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #08080c;
+            color: #e2e2ec;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.25);
+            font-size: 1.8rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 680px;
+            background: #111116;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid #1f1f2a;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: #0a0a0e;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #181822;
+        }
+
+        .stat-box.full-width {
+            grid-column: span 3;
+            border-color: #ffcc00;
+        }
+
+        .liters-count {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffcc00;
+        }
+
+        .money-count {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #00ff66;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #727286;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .diamond-text { color: #00ccff; }
+        .boost-banner {
+            display: none;
+            background: linear-gradient(90deg, #ff3366, #ff00cc);
+            color: white;
+            padding: 6px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .click-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .click-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #181822 0%, #0a0a0e 100%);
+            border: 4px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
+            cursor: pointer;
+            font-size: 3.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.05s;
+            user-select: none;
+        }
+
+        .click-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.35);
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            background: #181822;
+            border: 1px solid #1f1f2a;
+            color: #9898a8;
+            padding: 8px 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: #ffcc00;
+            color: #08080c;
+            border-color: #ffcc00;
+        }
+
+        .panel {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .panel.active { display: flex; }
+
+        .panel::-webkit-scrollbar { width: 5px; }
+        .panel::-webkit-scrollbar-thumb { background: #323242; border-radius: 3px; }
+
+        .upgrade-item, .market-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #15151f;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #1f1f2a;
+            gap: 10px;
+        }
+
+        .action-btns { display: flex; flex-direction: column; gap: 4px; }
+
+        .buy-btn, .station-btn, .skin-btn, .trade-btn {
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .buy-btn { background: #009944; }
+        .buy-btn:hover:not(:disabled) { background: #00bb55; }
+        .station-btn { background: #2255dd; }
+        .station-btn:hover:not(:disabled) { background: #4477ff; }
+        .skin-btn { background: #9922dd; }
+        .skin-btn.equipped { background: #ffcc00; color: #000; }
+        .trade-btn { background: #e65100; }
+
+        .buy-btn:disabled, .station-btn:disabled, .skin-btn:disabled, .trade-btn:disabled {
+            background: #25252e;
+            color: #4c4c58;
+            cursor: not-allowed;
+        }
+
+        .prestige-box {
+            text-align: center;
+            padding: 20px;
+            background: #150d22;
+            border: 1px solid #3d1694;
+            border-radius: 12px;
+        }
+
+        .event-overlay {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            width: 90%;
+            max-width: 460px;
+            background: #13151c;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        .event-overlay.active { transform: translateX(-50%) translateY(0); }
+        .event-title { color: #ffcc00; font-weight: bold; margin-bottom: 5px; font-size: 1.1rem; }
+        .event-desc { font-size: 0.85rem; margin-bottom: 12px; color: #ccc; }
+        .event-choices { display: flex; flex-direction: column; gap: 6px; }
+        .event-choice-btn { background: #222530; border: 1px solid #333848; color: white; padding: 8px; border-radius: 6px; cursor: pointer; text-align: left; font-size: 0.8rem; }
+        .event-choice-btn:hover { background: #2d3140; }
+
+        .floating-text { position: absolute; color: #ffcc00; font-weight: 900; font-size: 1.4rem; pointer-events: none; animation: floatUp 0.6s ease-out forwards; text-shadow: 2px 2px 3px #000; }
+        .floating-text.crit { color: #ff2222; font-size: 2rem; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-90px); } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="boost-banner" class="boost-banner"></div>
+
+        <div class="stats-grid">
+            <div class="stat-box" style="border-color: #ffcc00;">
+                <div class="stat-label">Бензин в баке</div>
+                <div class="liters-count" id="gas-amount">0</div>
+            </div>
+            <div class="stat-box" style="border-color: #00ff66;">
+                <div class="stat-label">Капитал (Деньги)</div>
+                <div class="money-count" id="money-amount">$0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Алмазы</div>
+                <div class="stat-value diamond-text" id="diamonds-amount">0 💎</div>
+            </div>
+            <div class="stat-box full-width" style="padding: 6px; display: flex; justify-content: space-around; font-size: 0.8rem;">
+                <div>Доход фабрик: <span id="cps-amount">+0 л/с</span></div>
+                <div>Курс бензина: <span id="gas-rate-display" style="color:#ffcc00; font-weight:bold;">$10</span> (через <span id="gas-timer">90</span>с)</div>
+            </div>
+        </div>
+
+        <div class="click-area" id="click-area">
+            <button class="click-btn" id="main-click-btn">⛽</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-upgrades" onclick="switchTab('upgrades')">Заводы</button>
+            <button class="tab-btn" id="tab-market" onclick="switchTab('market')">Биржа</button>
+            <button class="tab-btn" id="tab-skills" onclick="switchTab('skills')">Навыки</button>
+            <button class="tab-btn" id="tab-skins" onclick="switchTab('skins')">Скины</button>
+            <button class="tab-btn" id="tab-prestige" onclick="switchTab('prestige')">Престиж</button>
+        </div>
+
+        <div id="upgrades-panel" class="panel active"></div>
+        <div id="skills-panel" class="panel"></div>
+        <div id="skins-panel" class="panel"></div>
+        
+        <div id="market-panel" class="panel">
+            <div class="market-section" style="flex-direction: column; align-items: stretch;">
+                <h3 style="color:#ffcc00; text-align:center;">Торговый Терминал Бензина</h3>
+                <p style="font-size:0.8rem; text-align:center; color:#aaa;">Копите сырье, ждите пиковый курс ($14-15) и фиксируйте прибыль!</p>
+                <div style="display:flex; justify-content:space-around; margin: 10px 0;">
+                    <button class="trade-btn" style="flex:1; margin-right:5px; background:#e65100;" onclick="sellGas(0.25)">Продать 25%</button>
+                    <button class="trade-btn" style="flex:1; margin-left:5px; background:#d84315;" onclick="sellGas(1)">Продать ВЕСЬ бензин</button>
+                </div>
+            </div>
+            
+            <div class="market-section" style="flex-direction: column; align-items: stretch; margin-top:5px;">
+                <h3 style="text-align:center;">Акции & Венчурные Инвестиции</h3>
+                <div style="background:#0a0a0e; padding:8px; border-radius:6px; margin:8px 0; text-align:center;">
+                    <div>Акции GazCorp: <span id="share-price" style="color:#00ff66; font-weight:bold;">$100</span> (Смена: <span id="share-timer">60</span>с)</div>
+                    <div style="font-size:0.8rem; color:#aaa;">В портфеле: <span id="owned-shares">0</span> шт.</div>
+                </div>
+                <div style="display:flex; gap:5px; margin-bottom:10px;">
+                    <button class="buy-btn" style="flex:1;" onclick="buyShare()">Купить 1 акцию</button>
+                    <button class="trade-btn" style="flex:1; background:#b71c1c;" onclick="sellShares()">Продать ВСЕ акции</button>
+                </div>
+                <hr style="border-color:#222; margin:8px 0;">
+                <div id="investments-list" style="display:flex; flex-direction:column; gap:5px;"></div>
+            </div>
+        </div>
+
+        <div id="prestige-panel" class="panel">
+            <div class="prestige-box">
+                <h2>Слияние Трастов (Ребитх)</h2>
+                <p style="font-size:0.85rem; color:#9898a8; margin: 6px 0;">Сброс заводов и ресурсов в обмен на Кристаллы.</p>
+                <p style="font-weight:bold; margin:8px 0;">Вы получите: <span id="pending-diamonds" class="diamond-text">0 💎</span></p>
+                <p style="font-size:0.75rem; color:#ffcc00;">Доступно при балансе капитала от **$10,000**! Награда: от 1 до 10 💎</p>
+                <button class="rebirth-btn" style="background:#4a148c; color:white; padding:10px 20px; border:none; border-radius:8px; font-weight:bold; margin-top:8px; cursor:pointer;" id="rebirth-btn" onclick="triggerRebirth()">Начать слияние</button>
+            </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:0.75rem;">
+            <span id="offline-summary" style="color:#aaa; align-self:center;"></span>
+            <button onclick="hardReset()" style="background:none; border:1px solid #ff3333; color:#ff3333; padding:4px 8px; border-radius:6px; cursor:pointer;">Сброс сейва</button>
+        </div>
+    </div>
+
+    <div id="event-box" class="event-overlay">
+        <div id="event-title" class="event-title"></div>
+        <div id="event-desc" class="event-desc"></div>
+        <div id="event-choices" class="event-choices"></div>
+    </div>
+    <script>
+        let game = {
+            gas: 0,
+            money: 0,
+            diamonds: 0,
+            clickLvl: 1,
+            clickCost: 15,
+            shares: 0,
+            currentSkin: "default",
+            ownedSkins: ["default"],
+            skills: { critChance: 0, critMult: 0, discount: 0, production: 0, luck: 0, autoclick: 0 },
+            activeInvestments: [],
+            buildings: [],
+            lastSaveTime: Date.now()
+        };
+
+        let activeBoost = { type: "none", mult: 1, time: 0 };
+        let gasRate = 10;
+        let gasTicks = 90;
+        let sharePrice = 100;
+        let shareTicks = 60;
+
+        const buildingDefinitions = [
+            { id: 0, name: "Ручной бур во дворе", baseCps: 0.2, baseCost: 15, costMult: 1.15 },
+            { id: 1, name: "Улучшенная лопата", baseCps: 1, baseCost: 100, costMult: 1.16 },
+            { id: 2, name: "Канистровый конвейер", baseCps: 5, baseCost: 1100, costMult: 1.17 },
+            { id: 3, name: "Мини-скважина", baseCps: 22, baseCost: 12000, costMult: 1.18 },
+            { id: 4, name: "Пригородная АЗС", baseCps: 95, baseCost: 130000, costMult: 1.19 },
+            { id: 5, name: "Глубинный насос", baseCps: 450, baseCost: 1400000, costMult: 1.20 },
+            { id: 6, name: "Автоматическая вышка", baseCps: 2300, baseCost: 15000000, costMult: 1.21 },
+            { id: 7, name: "Магистральный нефтепровод", baseCps: 12000, baseCost: 160000000, costMult: 1.22 },
+            { id: 8, name: "Перерабатывающий НПЗ", baseCps: 65000, baseCost: 1700000000, costMult: 1.23 },
+            { id: 9, name: "Флот нефтетанкеров", baseCps: 380000, baseCost: 18000000000, costMult: 1.24 },
+            { id: 10, name: "Арктический шельф", baseCps: 2200000, baseCost: 200000000000, costMult: 1.25 },
+            { id: 11, name: "Подземное хранилище", baseCps: 13000000, baseCost: 2200000000000, costMult: 1.26 },
+            { id: 12, name: "Нефтяная госкорпорация", baseCps: 78000000, baseCost: 25000000000000, costMult: 1.27 },
+            { id: 13, name: "Экспресс-скважина", baseCps: 480000000, baseCost: 300000000000000, costMult: 1.28 },
+            { id: 14, name: "Трансконтинентальный синдикат", baseCps: 2900000000, baseCost: 3600000000000000, costMult: 1.29 },
+            { id: 15, name: "Орбитальный заправщик", baseCps: 18000000000, baseCost: 45000000000000000, costMult: 1.30 },
+            { id: 16, name: "Лунный экстрактор", baseCps: 115000000000, baseCost: 600000000000000000, costMult: 1.31 },
+            { id: 17, name: "Квантовый синтезатор", baseCps: 750000000000, baseCost: 8000000000000000000, costMult: 1.32 },
+            { id: 18, name: "Межгалактический провод", baseCps: 5000000000000, baseCost: 110000000000000000000, costMult: 1.33 },
+            { id: 19, name: "Жидкая сингулярность", baseCps: 35000000000000, baseCost: 1500000000000000000000, costMult: 1.34 }
+        ];
+
+        const skillDefinitions = [
+            { key: "critChance", name: "Углеродный фокус", desc: "+2% шанс крита за ур.", max: 10, cost: 1 },
+            { key: "critMult", name: "Турбо-взрыв", desc: "+x1 к силе крита за ур.", max: 10, cost: 1 },
+            { key: "discount", name: "Офшорный аудит", desc: "+4% скидка на здания за ур.", max: 10, cost: 2 },
+            { key: "production", name: "Катализатор синтеза", desc: "+15% к л/с всех зданий за ур.", max: 20, cost: 2 },
+            { key: "luck", name: "Удачливый магнат", desc: "События происходят на 15% чаще за ур.", max: 5, cost: 3 },
+            { key: "autoclick", name: "ИИ-Помпа", desc: "Авто-клик каждую секунду (+1 клик/с за ур.)", max: 5, cost: 4 }
+        ];
+
+        const skinDefinitions = [
+            { id: "default", name: "Стандарт", icon: "⛽", mult: 1, cost: 0 },
+            { id: "tractor", name: "Дизель Трактор", icon: "🚜", mult: 2.5, cost: 5 },
+            { id: "volcano", name: "Вулканический бур", icon: "🌋", mult: 4, cost: 15 },
+            { id: "ufo", name: "Космическое НЛО", icon: "🛸", mult: 6, cost: 45 }
+        ];
+
+        const investmentPlans = [
+            { id: 0, name: "Венчурный фонд ЭкоТЭК", cost: 500, duration: 60, payout: 850, desc: "Вложить $500, вернуть $850 через 1 мин." },
+            { id: 1, name: "Нефтяные Облигации", cost: 5000, duration: 180, payout: 9500, desc: "Вложить $5000, вернуть $9500 через 3 мин." },
+            { id: 2, name: "Сланцевый Стартап", cost: 50000, duration: 300, payout: 120000, desc: "Вложить $50K, вернуть $120K через 5 мин." }
+        ];
+
+        function initData() {
+            if (!game.buildings || game.buildings.length !== buildingDefinitions.length) {
+                game.buildings = buildingDefinitions.map(b => ({ id: b.id, count: 0, cost: b.baseCost, stationLvl: 1, stationCost: Math.round(b.baseCost * 2.5) }));
+            }
+            if (!game.activeInvestments) game.activeInvestments = [];
+            if (!game.ownedSkins) game.ownedSkins = ["default"];
+        }
+
+        if (localStorage.getItem("gasTycoonUltimateSave")) {
+            try {
+                let loaded = JSON.parse(localStorage.getItem("gasTycoonUltimateSave"));
+                if (loaded && typeof loaded === "object") {
+                    game = { ...game, ...loaded };
+                }
+            } catch (e) {}
+        }
+        initData();
+        const format = (num) => {
+            if (num < 1000) return Math.floor(num);
+            const exp = [
+                { val: 1e21, sym: "Sx" }, { val: 1e18, sym: "Qi" }, { val: 1e15, sym: "Qa" },
+                { val: 1e12, sym: "T" }, { val: 1e9, sym: "B" }, { val: 1e6, sym: "M" }, { val: 1e3, sym: "K" }
+            ];
+            for (let i = 0; i < exp.length; i++) {
+                if (num >= exp[i].val) return (num / exp[i].val).toFixed(2) + exp[i].sym;
+            }
+            return Math.floor(num);
+        };
+
+        const getDiscount = () => 1 - (game.skills.discount * 0.04);
+        const getProductionBonus = () => 1 + (game.skills.production * 0.15);
+        const getSkinMult = () => skinDefinitions.find(s => s.id === game.currentSkin)?.mult || 1;
+
+        const getBuildingCps = (bState) => {
+            let def = buildingDefinitions[bState.id];
+            let stationMult = 1 + (bState.stationLvl - 1) * 0.5;
+            return def.baseCps * bState.count * stationMult * getProductionBonus();
+        };
+
+        const getCps = () => {
+            let total = game.buildings.reduce((sum, b) => sum + getBuildingCps(b), 0);
+            if (activeBoost.type === "all") total *= activeBoost.mult;
+            return total;
+        };
+
+        const getClickPower = () => {
+            let base = (game.clickLvl + game.buildings.reduce((sum, b) => sum + b.count, 0) * 0.2) * getSkinMult();
+            if (activeBoost.type === "click") base *= activeBoost.mult;
+            return Math.max(1, Math.floor(base));
+        };
+
+        const getPendingDiamonds = () => {
+            if (game.money < 10000) return 0;
+            return Math.min(10, Math.max(1, Math.floor(Math.sqrt(game.money / 10000))));
+        };
+
+        function processOfflineProgress() {
+            let passed = Math.floor((Date.now() - game.lastSaveTime) / 1000);
+            if (passed > 30) {
+                let simulatedCps = game.buildings.reduce((sum, b) => sum + (buildingDefinitions[b.id].baseCps * b.count * (1 + (b.stationLvl - 1) * 0.5) * (1 + (game.skills.production * 0.15))), 0);
+                let earnedGas = simulatedCps * passed * 0.05;
+                if (earnedGas > 0) {
+                    game.gas += earnedGas;
+                    document.getElementById("offline-summary").textContent = `В офлайне добыто: +${format(earnedGas)} л бензина (за ${passed}с)`;
+                    setTimeout(() => { document.getElementById("offline-summary").textContent = ""; }, 8000);
+                }
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${tab}-panel`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+        function buildPanels() {
+            const upgPanel = document.getElementById("upgrades-panel");
+            upgPanel.innerHTML = `
+                <div class="upgrade-item">
+                    <div class="upgrade-info"><h3>Насосный рычаг (Клик)</h3><p>Сила: <span id="c-power">1</span> л (Ур. <span id="c-lvl">1</span>)</p></div>
+                    <div class="action-btns"><button class="buy-btn" id="btn-u-click" onclick="buyClick()">0 л</button></div>
+                </div>
+            `;
+            buildingDefinitions.forEach(b => {
+                upgPanel.innerHTML += `
+                    <div class="upgrade-item">
+                        <div class="upgrade-info"><h3>${b.name}</h3><p>Доход: +${format(b.baseCps)} л/с | Колич: <span id="b-cnt-${b.id}">0</span></p><p style="color:#66ff99; font-size:0.7rem;">Энергостанция: Ур. <span id="b-st-${b.id}">1</span> (+50%)</p></div>
+                        <div class="action-btns"><button class="buy-btn" id="btn-b-${b.id}" onclick="buyBuilding(${b.id})">0 л</button><button class="station-btn" id="btn-st-${b.id}" onclick="upgradeStation(${b.id})">⚡ Ур+: 0 л</button></div>
+                    </div>
+                `;
+            });
+
+            const skillPanel = document.getElementById("skills-panel"); skillPanel.innerHTML = "";
+            skillDefinitions.forEach(s => {
+                skillPanel.innerHTML += `<div class="skill-item" style="display:flex; justify-content:space-between; align-items:center; background:#15151f; padding:10px 15px; border-radius:10px; border:1px solid #1f1f2a;"><div><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#00ccff; font-size:0.75rem;">Уровень: <span id="sk-lvl-${s.key}">0</span> / ${s.max}</p></div><button class="skill-btn" id="btn-sk-${s.key}" onclick="buySkill('${s.key}')">0 💎</button></div>`;
+            });
+
+            const skinsPanel = document.getElementById("skins-panel"); skinsPanel.innerHTML = "";
+            skinDefinitions.forEach(s => {
+                skinsPanel.innerHTML += `<div class="upgrade-item"><div class="upgrade-info"><h3>${s.icon} ${s.name}</h3><p>Множитель клика: <b>x${s.mult}</b></p></div><div class="action-btns"><button class="skin-btn" id="btn-skn-${s.id}" onclick="selectSkin('${s.id}')">Купить</button></div></div>`;
+            });
+
+            const invList = document.getElementById("investments-list"); invList.innerHTML = "";
+            investmentPlans.forEach(p => {
+                invList.innerHTML += `<div class="upgrade-item" style="background:#0c0c12;"><div class="upgrade-info"><h4>${p.name}</h4><p>${p.desc}</p><p id="inv-status-${p.id}" style="color:#aaa; font-size:0.75rem;">Свободен</p></div><button class="buy-btn" id="btn-inv-${p.id}" onclick="startInvestment(${p.id})" style="background:#2255dd;">Вложить</button></div>`;
+            });
+        }
+
+        function updateUI() {
+            document.getElementById("gas-amount").textContent = format(game.gas);
+            document.getElementById("money-amount").textContent = "\$" + format(game.money);
+            document.getElementById("diamonds-amount").textContent = game.diamonds + " 💎";
+            document.getElementById("cps-amount").textContent = "+" + format(getCps()) + " л/с";
+            document.getElementById("c-power").textContent = format(getClickPower());
+            document.getElementById("c-lvl").textContent = game.clickLvl;
+            document.getElementById("gas-rate-display").textContent = "\$" + gasRate;
+            document.getElementById("gas-timer").textContent = Math.ceil(gasTicks);
+            document.getElementById("share-price").textContent = "\$" + format(sharePrice);
+            document.getElementById("share-timer").textContent = Math.ceil(shareTicks);
+            document.getElementById("owned-shares").textContent = game.shares;
+
+            document.getElementById("main-click-btn").textContent = skinDefinitions.find(s => s.id === game.currentSkin)?.icon || "⛽";
+
+            let btnClick = document.getElementById("btn-u-click");
+            btnClick.textContent = format(game.clickCost) + " л";
+            btnClick.disabled = game.gas < game.clickCost;
+
+            game.buildings.forEach(b => {
+                let discCost = Math.max(1, Math.round(b.cost * getDiscount()));
+                document.getElementById(`b-cnt-${b.id}`).textContent = b.count;
+                document.getElementById(`b-st-${b.id}`).textContent = b.stationLvl;
+                document.getElementById(`btn-b-${b.id}`).textContent = format(discCost) + " л";
+                document.getElementById(`btn-b-${b.id}`).disabled = game.gas < discCost;
+                document.getElementById(`btn-st-${b.id}`).textContent = "⚡ Ур+: " + format(b.stationCost) + " л";
+                document.getElementById(`btn-st-${b.id}`).disabled = game.gas < b.stationCost;
+            });
+
+            skillDefinitions.forEach(s => {
+                let lvl = game.skills[s.key] || 0; let cost = s.cost * (lvl + 1);
+                document.getElementById(`sk-lvl-${s.key}`).textContent = lvl;
+                let sBtn = document.getElementById(`btn-sk-${s.key}`);
+                sBtn.textContent = lvl >= s.max ? "МАКС" : `${cost} 💎`;
+                sBtn.disabled = lvl >= s.max || game.diamonds < cost;
+            });
+
+            skinDefinitions.forEach(s => {
+                let btn = document.getElementById(`btn-skn-${s.id}`);
+                if (!btn) return;
+                if (game.currentSkin === s.id) { btn.textContent = "Надет"; btn.className = "skin-btn equipped"; btn.disabled = true; }
+                else if (game.ownedSkins.includes(s.id)) { btn.textContent = "Выбрать"; btn.className = "skin-btn"; btn.disabled = false; }
+                else { btn.textContent = `${s.cost} 💎`; btn.className = "skin-btn"; btn.disabled = game.diamonds < s.cost; }
+            });
+
+            investmentPlans.forEach(p => {
+                let active = game.activeInvestments.find(x => x.id === p.id);
+                let btn = document.getElementById(`btn-inv-${p.id}`);
+                let txt = document.getElementById(`inv-status-${p.id}`);
+                if (active) { btn.disabled = true; txt.textContent = `Контракт активен: ${Math.ceil(active.remains)}с`; txt.style.color = "#00ff66"; } 
+                else { btn.disabled = game.money < p.cost; txt.textContent = "Доступен"; txt.style.color = "#aaa"; }
+            });
+
+            let pend = getPendingDiamonds();
+            document.getElementById("pending-diamonds").textContent = pend + " 💎";
+            document.getElementById("rebirth-btn").disabled = pend <= 0;
+
+            let banner = document.getElementById("boost-banner");
+            if (activeBoost.time > 0) { banner.style.display = "block"; banner.textContent = `БУСТ: Экстра-Множитель x${activeBoost.mult} (${Math.ceil(activeBoost.time)}с)`; } else { banner.style.display = "none"; }
+        }
+
+        function buyClick() { if (game.gas >= game.clickCost) { game.gas -= game.clickCost; game.clickLvl++; game.clickCost = Math.round(game.clickCost * 1.45); updateUI(); save(); } }
+        function buyBuilding(id) { let b = game.buildings[id]; let cost = Math.max(1, Math.round(b.cost * getDiscount())); if (game.gas >= cost) { game.gas -= cost; b.count++; b.cost = Math.round(b.cost * buildingDefinitions[id].costMult); updateUI(); save(); } }
+        function upgradeStation(id) { let b = game.buildings[id]; if (game.gas >= b.stationCost) { game.gas -= b.stationCost; b.stationLvl++; b.stationCost = Math.round(b.stationCost * 3.2); updateUI(); save(); } }
+        function buySkill(key) { let s = skillDefinitions.find(x => x.key === key); let lvl = game.skills[key] || 0; let cost = s.cost * (lvl + 1); if (game.diamonds >= cost && lvl < s.max) { game.diamonds -= cost; game.skills[key] = lvl + 1; updateUI(); save(); } }
+        function selectSkin(id) { let s = skinDefinitions.find(x => x.id === id); if (game.ownedSkins.includes(id)) { game.currentSkin = id; } else if (game.diamonds >= s.cost) { game.diamonds -= s.cost; game.ownedSkins.push(id); game.currentSkin = id; } updateUI(); save(); }
+        
+        function sellGas(pct) { let amt = game.gas * pct; if (amt > 0) { game.money += amt * gasRate; game.gas -= amt; updateUI(); save(); } }
+        function buyShare() { if (game.money >= sharePrice) { game.money -= sharePrice; game.shares++; updateUI(); save(); } }
+        function sellShares() { if (game.shares > 0) { game.money += game.shares * sharePrice; game.shares = 0; updateUI(); save(); } }
+        
+        function startInvestment(id) {
+            let plan = investmentPlans.find(x => x.id === id);
+            if (game.money >= plan.cost && !game.activeInvestments.some(x => x.id === id)) {
+                game.money -= plan.cost; game.activeInvestments.push({ id: id, remains: plan.duration, payout: plan.payout }); updateUI(); save();
+            }
+        }
+
+        function triggerRebirth() {
+            let p = getPendingDiamonds();
+            if (p > 0 && confirm(`Сбросить фабрики ради получения ${p} 💎?`)) {
+                game.money = 0; game.gas = 0; game.clickLvl = 1; game.clickCost = 15; game.shares = 0; game.activeInvestments = [];
+                game.buildings = []; initData(); activeBoost = { type: "none", mult: 1, time: 0 };
+                switchTab('upgrades'); updateUI(); save();
+            }
+        }
+
+        function hardReset() { if (confirm("Стереть весь игровой профиль безвозвратно?")) { localStorage.removeItem("gasTycoonUltimateSave"); location.reload(); } }
+        function save() { game.lastSaveTime = Date.now(); localStorage.setItem("gasTycoonUltimateSave", JSON.stringify(game)); }
+
+        document.getElementById("main-click-btn").addEventListener("click", () => {
+            let ch = 0.02 + (game.skills.critChance * 0.02); let isCrit = Math.random() < ch;
+            let pwr = getClickPower(); if (isCrit) pwr *= (4 + game.skills.critMult);
+            game.gas += pwr;
+            let f = document.createElement("div"); f.className = "floating-text" + (isCrit ? " crit" : ""); f.textContent = (isCrit ? "КРИТ! +" : "+") + format(pwr);
+            let rx = (Math.random() - 0.5) * 60; f.style.left = `calc(50% + ${rx}px)`; f.style.top = "40px";
+            document.getElementById("click-area").appendChild(f); setTimeout(() => f.remove(), 600);
+            updateUI();
+        });
+
+        const pool = [
+            { t: "Забастовка на вышке!", d: "Бурильщики требуют премию за тяжелую смену.", c: [{ n: "Выплатить премию (-10% капитала)", a: () => { game.money -= game.money * 0.1; } }, { n: "Отказать (Урезать доход наполовину на 15с)", a: () => { activeBoost = { type: "all", mult: 0.5, time: 15 }; } }] },
+            { t: "Всплеск котировок GazCorp", d: "Наши акции резко подскочили на фоне хорошего отчета!", c: [{ n: "Зафиксировать тренд (Цена акций +50%)", a: () => { sharePrice = Math.round(sharePrice * 1.5); } }] },
+            { t: "Внеплановый аудит налоговой", d: "Инспекторы тщательно проверяют всю вашу бухгалтерию.", c: [{ n: "Заплатить пошлину (\$150)", a: () => { game.money = Math.max(0, game.money - 150); } }, { n: "Рискнуть (Шанс 50/50: Всё обойдется или штраф 40% денег)", a: () => { if(Math.random()<0.5) game.money -= game.money*0.4; } }] },
+            { t: "Углеродный катализатор!", d: "Ученые открыли добавку, резко разгоняющую распад топлива.", c: [{ n: "Залить в баки (x3 ко всему доходу на 20 секунд)", a: () => { activeBoost = { type: "all", mult: 3, time: 20 }; } }] }
+        ];
+
+        function triggerEvent() {
+            if (document.getElementById("event-box").classList.contains("active")) return;
+            activeEvent = pool[Math.floor(Math.random() * pool.length)];
+            document.getElementById("event-title").textContent = activeEvent.t;
+            document.getElementById("event-desc").textContent = activeEvent.d;
+            let container = document.getElementById("event-choices"); container.innerHTML = "";
+            activeEvent.c.forEach(ch => {
+                let btn = document.createElement("button"); btn.className = "event-choice-btn"; btn.textContent = ch.n;
+                btn.onclick = () => { ch.a(); document.getElementById("event-box").classList.remove("active"); updateUI(); save(); };
+                container.appendChild(btn);
+            });
+            document.getElementById("event-box").classList.add("active");
+        }
+
+        setInterval(() => {
+            let cps = getCps(); if (cps > 0) game.gas += cps / 10;
+            if (game.skills.autoclick > 0) game.gas += (getClickPower() * game.skills.autoclick) / 10;
+            
+            if (activeBoost.time > 0) { activeBoost.time = Math.max(0, (activeBoost.time - 0.1).toFixed(1)); if (activeBoost.time == 0) activeBoost = { type: "none", mult: 1, time: 0 }; }
+            
+            gasTicks -= 0.1;
+            if (gasTicks <= 0) { gasRate = Math.floor(5 + Math.random() * 11); gasTicks = 90; }
+            
+            shareTicks -= 0.1;
+            if (shareTicks <= 0) { sharePrice = Math.max(15, Math.round(sharePrice * (0.5 + Math.random() * 1.15))); shareTicks = 60; }
+            
+            game.activeInvestments.forEach((inv, index) => {
+                inv.remains -= 0.1;
+                if (inv.remains <= 0) { game.money += inv.payout; game.activeInvestments.splice(index, 1); }
+            });
+            
+            updateUI();
+        }, 100);
+
+        setInterval(triggerEvent, 45000 - (game.skills.luck * 5000));
+        setInterval(save, 15000);
+
+        buildPanels();
+        processOfflineProgress();
+        updateUI();
+    </script>
+</body>
+</html>

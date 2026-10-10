@@ -1,0 +1,777 @@
+ <!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gas Tycoon EVOLUTION</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0f0f12;
+            color: #e4e4eb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+            font-size: 2rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 650px;
+            background: #17171f;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            border: 1px solid #282833;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: #111116;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #22222b;
+        }
+
+        .stat-box.full-width {
+            grid-column: span 2;
+            border-color: #ffcc00;
+        }
+
+        .liters-count {
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: #ffcc00;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #7d7d91;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .diamond-text {
+            color: #00ccff;
+        }
+
+        .boost-banner {
+            display: none;
+            background: linear-gradient(90deg, #ff3366, #ff00cc);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+        }
+
+        .click-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .click-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #22222b 0%, #111116 100%);
+            border: 5px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.15);
+            cursor: pointer;
+            font-size: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.05s, box-shadow 0.2s;
+            user-select: none;
+        }
+
+        .click-btn:active {
+            transform: scale(0.94);
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: #22222b;
+            border: 1px solid #2d2d3d;
+            color: #a5a5b5;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .tab-btn.active {
+            background: #ffcc00;
+            color: #0f0f12;
+            border-color: #ffcc00;
+        }
+
+        .panel {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .panel.active {
+            display: flex;
+        }
+
+        .panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel::-webkit-scrollbar-thumb {
+            background: #3c3c4f;
+            border-radius: 3px;
+        }
+
+        .upgrade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1e1e26;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #2d2d3d;
+            gap: 10px;
+        }
+
+        .upgrade-info {
+            flex: 1;
+        }
+
+        .upgrade-info h3 {
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        .upgrade-info p {
+            font-size: 0.75rem;
+            color: #a5a5b5;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .buy-btn, .station-btn {
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            min-width: 105px;
+            text-align: center;
+        }
+
+        .buy-btn {
+            background: #00aa55;
+        }
+
+        .buy-btn:hover:not(:disabled) {
+            background: #00cc66;
+        }
+
+        .station-btn {
+            background: #3366ff;
+        }
+
+        .station-btn:hover:not(:disabled) {
+            background: #5588ff;
+        }
+
+        .buy-btn:disabled, .station-btn:disabled {
+            background: #33333d;
+            color: #666675;
+            cursor: not-allowed;
+        }
+
+        .skill-item {
+            background: #1e1e26;
+            border: 1px solid #2d2d3d;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .skill-btn {
+            background: #00ccff;
+            color: #000;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .skill-btn:disabled {
+            background: #33333d;
+            color: #666675;
+            cursor: not-allowed;
+        }
+
+        .prestige-box {
+            text-align: center;
+            padding: 20px;
+            background: #21153b;
+            border: 1px solid #5c26d6;
+            border-radius: 12px;
+        }
+
+        .rebirth-btn {
+            background: #7928ca;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.05rem;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(121, 40, 202, 0.4);
+        }
+
+        .rebirth-btn:disabled {
+            background: #33333d;
+            color: #666675;
+            box-shadow: none;
+            cursor: not-allowed;
+        }
+
+        .event-overlay {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-150%);
+            width: 90%;
+            max-width: 450px;
+            background: #1f2430;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        .event-overlay.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .event-title {
+            color: #ffcc00;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .event-desc {
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+
+        .event-choices {
+            display: flex;
+            gap: 8px;
+        }
+
+        .event-choice-btn {
+            flex: 1;
+            background: #2b3245;
+            border: 1px solid #3d4661;
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .floating-text {
+            position: absolute;
+            color: #ffcc00;
+            font-weight: 900;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            text-shadow: 2px 2px 4px #000;
+        }
+
+        .floating-text.crit {
+            color: #ff3333;
+            font-size: 2.2rem;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.8); }
+        }
+
+        .footer-controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid #ff3333;
+            color: #ff3333;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Gas Tycoon: Evolution</h1>
+    </header>
+    <div class="container">
+        <div id="boost-banner" class="boost-banner"></div>
+
+        <div class="stats-grid">
+            <div class="stat-box full-width">
+                <div class="stat-label">Запасы бензина</div>
+                <div class="liters-count" id="gas-amount">0</div>
+            </div>
+            <div class="stats-box" style="background:#111116; padding:10px; border-radius:12px; text-align:center; border:1px solid #22222b;">
+                <div class="stat-label">Общий доход</div>
+                <div class="stat-value" id="cps-amount">+0 л/с</div>
+            </div>
+            <div class="stats-box" style="background:#111116; padding:10px; border-radius:12px; text-align:center; border:1px solid #22222b;">
+                <div class="stat-label">Свободные Алмазы</div>
+                <div class="stat-value diamond-text" id="diamonds-amount">0 💎</div>
+            </div>
+        </div>
+
+        <div class="click-area" id="click-area">
+            <button class="click-btn" id="main-click-btn">⛽</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('upgrades')">Инфраструктура</button>
+            <button class="tab-btn" onclick="switchTab('skills')">Навыки</button>
+            <button class="tab-btn" onclick="switchTab('prestige')">Престиж</button>
+        </div>
+
+        <div id="upgrades-panel" class="panel active"></div>
+        <div id="skills-panel" class="panel"></div>
+
+        <div id="prestige-panel" class="panel">
+            <div class="prestige-box">
+                <h3>Реорганизация Империи</h3>
+                <p style="font-size:0.85rem; color:#a5a5b5; margin: 8px 0;">Сбросьте ваши заводы и бензин в обмен на Нефтяные Алмазы.</p>
+                <p style="font-size:1.1rem; font-weight:bold; margin-bottom:10px;">Вы получите: <span id="pending-diamonds" style="color:#00ccff;">0 💎</span></p>
+                <p style="font-size:0.75rem; color:#ff3366; margin-bottom:10px;">Требуется накопить минимум: 10.00M литров бензина</p>
+                <button class="rebirth-btn" id="rebirth-btn">Начать слияние</button>
+            </div>
+        </div>
+
+        <div class="footer-controls">
+            <button class="reset-btn" id="reset-btn">Полное обнуление</button>
+        </div>
+    </div>
+
+    <div id="event-box" class="event-overlay">
+        <div id="event-title" class="event-title"></div>
+        <div id="event-desc" class="event-desc"></div>
+        <div id="event-choices" class="event-choices"></div>
+    </div>
+    <script>
+        let game = {
+            gas: 0,
+            diamonds: 0,
+            totalDiamondsEarned: 0,
+            clickLvl: 1,
+            clickCost: 10,
+            skills: { critChance: 0, critMult: 0, discount: 0, production: 0 },
+            buildings: []
+        };
+
+        let activeBoost = { type: "none", mult: 1, time: 0 };
+        let activeEvent = null;
+
+        const buildingDefinitions = [
+            { id: 0, name: "Ручной бур во дворе", baseCps: 0.2, baseCost: 15, costMult: 1.15 },
+            { id: 1, name: "Улучшенная лопата", baseCps: 1, baseCost: 100, costMult: 1.16 },
+            { id: 2, name: "Канистровый конвейер", baseCps: 5, baseCost: 1100, costMult: 1.17 },
+            { id: 3, name: "Мини-скважина", baseCps: 22, baseCost: 12000, costMult: 1.18 },
+            { id: 4, name: "Пригородная АЗС", baseCps: 95, baseCost: 130000, costMult: 1.19 },
+            { id: 5, name: "Глубинный насос", baseCps: 450, baseCost: 1400000, costMult: 1.20 },
+            { id: 6, name: "Автоматическая вышка", baseCps: 2300, baseCost: 15000000, costMult: 1.21 },
+            { id: 7, name: "Магистральный нефтепровод", baseCps: 12000, baseCost: 160000000, costMult: 1.22 },
+            { id: 8, name: "Перерабатывающий НПЗ", baseCps: 65000, baseCost: 1700000000, costMult: 1.23 },
+            { id: 9, name: "Флот нефтетанкеров", baseCps: 380000, baseCost: 18000000000, costMult: 1.24 },
+            { id: 10, name: "Арктический шельф", baseCps: 2200000, baseCost: 200000000000, costMult: 1.25 },
+            { id: 11, name: "Подземное хранилище", baseCps: 13000000, baseCost: 2200000000000, costMult: 1.26 },
+            { id: 12, name: "Нефтяная госкорпорация", baseCps: 78000000, baseCost: 25000000000000, costMult: 1.27 },
+            { id: 13, name: "Сверхглубокая экспресс-скважина", baseCps: 480000000, baseCost: 300000000000000, costMult: 1.28 },
+            { id: 14, name: "Трансконтинентальный синдикат", baseCps: 2900000000, baseCost: 3600000000000000, costMult: 1.29 },
+            { id: 15, name: "Орбитальный заправщик", baseCps: 18000000000, baseCost: 45000000000000000, costMult: 1.30 },
+            { id: 16, name: "Лунный экстрактор гелия-нефти", baseCps: 115000000000, baseCost: 600000000000000000, costMult: 1.31 },
+            { id: 17, name: "Квантовый синтезатор топлива", baseCps: 750000000000, baseCost: 8000000000000000000, costMult: 1.32 },
+            { id: 18, name: "Межгалактический бензопровод", baseCps: 5000000000000, baseCost: 110000000000000000000, costMult: 1.33 },
+            { id: 19, name: "Сингулярность жидкого углерода", baseCps: 35000000000000, baseCost: 1500000000000000000000, costMult: 1.34 }
+        ];
+
+        const skillDefinitions = [
+            { key: "critChance", name: "Углеродный фокус", desc: "+2% шанс крита за уровень", max: 10, cost: 1 },
+            { key: "critMult", name: "Турбо-взрыв", desc: "+x1 к множителю крита за уровень", max: 10, cost: 1 },
+            { key: "discount", name: "Офшорный аудит", desc: "+4% скидка на все постройки за уровень", max: 10, cost: 2 },
+            { key: "production", name: "Катализатор синтеза", desc: "+15% к производству всех зданий за уровень", max: 20, cost: 2 }
+        ];
+
+        function initData() {
+            if (game.buildings.length !== buildingDefinitions.length) {
+                game.buildings = buildingDefinitions.map(b => ({ 
+                    id: b.id, 
+                    count: 0, 
+                    cost: b.baseCost, 
+                    stationLvl: 1, 
+                    stationCost: Math.round(b.baseCost * 2.5) 
+                }));
+            }
+        }
+
+        if (localStorage.getItem("gasTycoonEvSave")) {
+            try {
+                let loaded = JSON.parse(localStorage.getItem("gasTycoonEvSave"));
+                if (loaded && typeof loaded === "object") {
+                    game = { ...game, ...loaded };
+                    if(loaded.skills) game.skills = { ...game.skills, ...loaded.skills };
+                }
+            } catch(e) {}
+        }
+        initData();
+
+        const format = (num) => {
+            if (num < 1000) return Math.floor(num);
+            const exp = [
+                { val: 1e21, sym: "Sx" }, { val: 1e18, sym: "Qi" }, { val: 1e15, sym: "Qa" },
+                { val: 1e12, sym: "T" }, { val: 1e9, sym: "B" }, { val: 1e6, sym: "M" }, { val: 1e3, sym: "K" }
+            ];
+            for (let i = 0; i < exp.length; i++) {
+                if (num >= exp[i].val) return (num / exp[i].val).toFixed(2) + exp[i].sym;
+            }
+            return Math.floor(num);
+        };
+
+        const getDiscount = () => 1 - (game.skills.discount * 0.04);
+        const getProductionBonus = () => 1 + (game.skills.production * 0.15);
+
+        const getBuildingCps = (bState) => {
+            let def = buildingDefinitions[bState.id];
+            let stationMult = 1 + (bState.stationLvl - 1) * 0.5;
+            return def.baseCps * bState.count * stationMult * getProductionBonus();
+        };
+
+        const getCps = () => {
+            let total = game.buildings.reduce((sum, b) => sum + getBuildingCps(b), 0);
+            if (activeBoost.type === "all") total *= activeBoost.mult;
+            return total;
+        };
+
+        const getClickPower = () => {
+            let base = game.clickLvl;
+            let totalBuildingsCount = game.buildings.reduce((sum, b) => sum + b.count, 0);
+            base += Math.floor(totalBuildingsCount * 0.2); 
+            if (activeBoost.type === "click") base *= activeBoost.mult;
+            return base;
+        };
+
+        const getPendingDiamonds = () => {
+            if (game.gas < 10000000) return 0;
+            return Math.floor(Math.sqrt(game.gas / 10000000) * 8);
+        };
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${tab}-panel`).classList.add('active');
+            if(event && event.target) event.target.classList.add('active');
+        }
+        function buildPanels() {
+            const upgPanel = document.getElementById("upgrades-panel");
+            upgPanel.innerHTML = `
+                <div class="upgrade-item">
+                    <div class="upgrade-info">
+                        <h3>Ручная помпа (Клик)</h3>
+                        <p>Сила клика: <span id="c-power">1</span> л (Ур. <span id="c-lvl">1</span>)</p>
+                    </div>
+                    <div class="action-btns">
+                        <button class="buy-btn" id="btn-u-click" onclick="buyClick()">0 л</button>
+                    </div>
+                </div>
+            `;
+
+            buildingDefinitions.forEach(b => {
+                upgPanel.innerHTML += `
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h3>${b.name}</h3>
+                            <p>Доход: +${format(b.baseCps)} л/с | Кол-во: <span id="b-cnt-${b.id}">0</span></p>
+                            <p style="color:#66ff99; font-size:0.7rem;">Энергостанция: Ур. <span id="b-st-${b.id}">1</span> (+50% к л/с)</p>
+                        </div>
+                        <div class="action-btns">
+                            <button class="buy-btn" id="btn-b-${b.id}" onclick="buyBuilding(${b.id})">0 л</button>
+                            <button class="station-btn" id="btn-st-${b.id}" onclick="upgradeStation(${b.id})">Станция: 0 л</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const skillPanel = document.getElementById("skills-panel");
+            skillPanel.innerHTML = "";
+            skillDefinitions.forEach(s => {
+                skillPanel.innerHTML += `
+                    <div class="skill-item">
+                        <div>
+                            <h3>${s.name}</h3>
+                            <p>${s.desc}</p>
+                            <p style="color:#00ccff; font-size:0.75rem;">Уровень: <span id="sk-lvl-${s.key}">0</span> / ${s.max}</p>
+                        </div>
+                        <button class="skill-btn" id="btn-sk-${s.key}" onclick="buySkill('${s.key}')">0 💎</button>
+                    </div>
+                `;
+            });
+        }
+
+        function updateUI() {
+            document.getElementById("gas-amount").textContent = format(game.gas);
+            document.getElementById("cps-amount").textContent = "+" + format(getCps()) + " л/с";
+            document.getElementById("diamonds-amount").textContent = game.diamonds + " 💎";
+
+            document.getElementById("c-power").textContent = format(getClickPower());
+            document.getElementById("c-lvl").textContent = game.clickLvl;
+            
+            let btnClick = document.getElementById("btn-u-click");
+            btnClick.textContent = format(game.clickCost) + " л";
+            btnClick.disabled = game.gas < game.clickCost;
+
+            game.buildings.forEach(b => {
+                let discCost = Math.max(1, Math.round(b.cost * getDiscount()));
+                document.getElementById(`b-cnt-${b.id}`).textContent = b.count;
+                document.getElementById(`b-st-${b.id}`).textContent = b.stationLvl;
+
+                let bBtn = document.getElementById(`btn-b-${b.id}`);
+                bBtn.textContent = format(discCost) + " л";
+                bBtn.disabled = game.gas < discCost;
+
+                let sBtn = document.getElementById(`btn-st-${b.id}`);
+                sBtn.textContent = "⚡ Ур+: " + format(b.stationCost) + " л";
+                sBtn.disabled = game.gas < b.stationCost;
+            });
+
+            skillDefinitions.forEach(s => {
+                let currentLvl = game.skills[s.key] || 0;
+                let cost = s.cost * (currentLvl + 1);
+                document.getElementById(`sk-lvl-${s.key}`).textContent = currentLvl;
+                
+                let sBtn = document.getElementById(`btn-sk-${s.key}`);
+                sBtn.textContent = currentLvl >= s.max ? "МАКС" : `${cost} 💎`;
+                sBtn.disabled = currentLvl >= s.max || game.diamonds < cost;
+            });
+
+            let pending = getPendingDiamonds();
+            document.getElementById("pending-diamonds").textContent = pending + " 💎";
+            document.getElementById("rebirth-btn").disabled = pending <= 0;
+
+            let banner = document.getElementById("boost-banner");
+            if (activeBoost.time > 0) {
+                banner.style.display = "block";
+                let text = activeBoost.type === "click" ? "АДРЕНАЛИНОВЫЙ БАК: Клик Множитель x" : "НЕФТЯНОЙ ПАКТ: Глобальный доход x";
+                banner.textContent = `${text}${activeBoost.mult} (${activeBoost.time}с)`;
+            } else {
+                banner.style.display = "none";
+            }
+        }
+
+        function buyClick() {
+            if (game.gas >= game.clickCost) {
+                game.gas -= game.clickCost;
+                game.clickLvl++;
+                game.clickCost = Math.round(game.clickCost * 1.45);
+                updateUI();
+            }
+        }
+
+        function buyBuilding(id) {
+            let b = game.buildings[id];
+            let discCost = Math.max(1, Math.round(b.cost * getDiscount()));
+            if (game.gas >= discCost) {
+                game.gas -= discCost;
+                b.count++;
+                b.cost = Math.round(b.cost * buildingDefinitions[id].costMult);
+                updateUI();
+            }
+        }
+
+        function upgradeStation(id) {
+            let b = game.buildings[id];
+            if (game.gas >= b.stationCost) {
+                game.gas -= b.stationCost;
+                b.stationLvl++;
+                b.stationCost = Math.round(b.stationCost * 3.2);
+                updateUI();
+            }
+        }
+
+        function buySkill(key) {
+            let s = skillDefinitions.find(x => x.key === key);
+            let currentLvl = game.skills[key] || 0;
+            let cost = s.cost * (currentLvl + 1);
+            if (game.diamonds >= cost && currentLvl < s.max) {
+                game.diamonds -= cost;
+                game.skills[key] = currentLvl + 1;
+                updateUI();
+                save();
+            }
+        }
+
+        function save() {
+            localStorage.setItem("gasTycoonEvSave", JSON.stringify(game));
+        }
+        document.getElementById("main-click-btn").addEventListener("click", () => {
+            let ch = 0.02 + (game.skills.critChance * 0.02);
+            let isCrit = Math.random() < ch;
+            let power = getClickPower();
+            if(isCrit) power *= (4 + game.skills.critMult);
+
+            game.gas += power;
+
+            let f = document.createElement("div");
+            f.className = "floating-text" + (isCrit ? " crit" : "");
+            f.textContent = (isCrit ? "КРИТ! +" : "+") + format(power);
+            let rx = (Math.random() - 0.5) * 60;
+            f.style.left = `calc(50% + ${rx}px)`;
+            f.style.top = "40px";
+            document.getElementById("click-area").appendChild(f);
+            setTimeout(() => f.remove(), 600);
+            updateUI();
+        });
+
+        document.getElementById("rebirth-btn").addEventListener("click", () => {
+            let p = getPendingDiamonds();
+            if (p > 0 && confirm(`Произвести слияние корпораций? Вы получите ${p} 💎, но инфраструктура будет сброшена.`)) {
+                game.diamonds += p;
+                game.totalDiamondsEarned += p;
+                game.gas = 0;
+                game.clickLvl = 1;
+                game.clickCost = 10;
+                game.buildings = [];
+                initData();
+                activeBoost = { type: "none", mult: 1, time: 0 };
+                switchTab('upgrades');
+                updateUI();
+                save();
+            }
+        });
+
+        document.getElementById("reset-btn").addEventListener("click", () => {
+            if (confirm("Вы уверены? Это сотрет сохранения и навыки полностью!")) {
+                localStorage.removeItem("gasTycoonEvSave");
+                location.reload();
+            }
+        });
+
+        const events = [
+            { t: "Нефтяной фонтан!", d: "На одной из ваших старых скважин пробило фонтан сырья!", c: [{ n: "Собрать в цистерны (+400% от дохода в сек)", a: () => { game.gas += getCps() * 4; } }] },
+            { t: "Адреналиновый бак", d: "Химики синтезировали новое супер-топливо для ручных насосов.", c: [{ n: "Активировать (x4 к клику на 15 секунд)", a: () => { activeBoost = { type: "click", mult: 4, time: 15 }; } }] },
+            { t: "Удачные торги на бирже", d: "Мировые котировки на топливо резко пошли вверх.", c: [{ n: "Подписать пакт (x3 ко всему доходу на 15 секунд)", a: () => { activeBoost = { type: "all", mult: 3, time: 15 }; } }] }
+        ];
+
+        function triggerEvent() {
+            if (document.getElementById("event-box").classList.contains("active")) return;
+            activeEvent = events[Math.floor(Math.random() * events.length)];
+            document.getElementById("event-title").textContent = activeEvent.t;
+            document.getElementById("event-desc").textContent = activeEvent.d;
+            let container = document.getElementById("event-choices");
+            container.innerHTML = "";
+            activeEvent.c.forEach(ch => {
+                let btn = document.createElement("button");
+                btn.className = "event-choice-btn";
+                btn.textContent = ch.n;
+                btn.onclick = () => {
+                    ch.a();
+                    document.getElementById("event-box").classList.remove("active");
+                    updateUI();
+                    save();
+                };
+                container.appendChild(btn);
+            });
+            document.getElementById("event-box").classList.add("active");
+        }
+
+        setInterval(() => {
+            let cps = getCps();
+            if (cps > 0) game.gas += cps / 10;
+            if (activeBoost.time > 0) {
+                activeBoost.time = Math.max(0, (activeBoost.time - 0.1).toFixed(1));
+                if (activeBoost.time == 0) activeBoost = { type: "none", mult: 1, time: 0 };
+            }
+            updateUI();
+        }, 100);
+
+        setInterval(save, 15000);
+        setInterval(triggerEvent, 40000);
+
+        buildPanels();
+        updateUI();
+    </script>
+</body>
+</html>

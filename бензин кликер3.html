@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gas Tycoon PRO: Yandex Games Edition</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #050507;
+            color: #e2e2ea;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        h1 {
+            color: #ffcc00;
+            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+            transition: transform 0.3s ease;
+        }
+
+        h1:hover {
+            transform: scale(1.02);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 750px;
+            background: #0d0d12;
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.75);
+            border: 1px solid #1a1a24;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            background: #07070a;
+            padding: 8px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #121218;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 65px;
+            transition: all 0.25s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #242433;
+            background: #09090f;
+        }
+
+        .stat-box.full-width {
+            grid-column: span 3;
+            border-color: #ffcc00;
+            min-height: auto;
+            padding: 5px;
+        }
+
+        .liters-count {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffcc00;
+            word-break: break-all;
+        }
+
+        .money-count {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #00ff66;
+            word-break: break-all;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: #6a6a7c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .stat-value {
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        .diamond-text { color: #00ccff; font-weight: 800; }
+        .money-text { color: #00ff66; }
+        .boost-banner {
+            display: none;
+            background: linear-gradient(90deg, #ff3366, #ff00cc);
+            color: white;
+            padding: 6px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            animation: pulseBanner 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseBanner {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        .click-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .click-btn {
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #1c1c28 0%, #07070a 100%);
+            border: 4px solid #ffcc00;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.15);
+            cursor: pointer;
+            font-size: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease, border-color 0.25s ease;
+            outline: none;
+        }
+
+        @media (hover: hover) {
+            .click-btn:hover {
+                transform: scale(1.08);
+                border-color: #ffe600;
+                box-shadow: 0 0 35px rgba(255, 204, 0, 0.45);
+            }
+        }
+
+        .click-btn:active {
+            transform: scale(0.92) !important;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.6) !important;
+        }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: #121218;
+            border: 1px solid #1a1a24;
+            color: #8c8c9c;
+            padding: 8px 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .tab-btn:hover {
+                background: #1c1c28;
+                color: #fff;
+                border-color: #333344;
+            }
+        }
+
+        .tab-btn.active {
+            background: #ffcc00;
+            color: #050507;
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.2);
+        }
+
+        .panel {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .panel.active { display: flex; }
+        .panel::-webkit-scrollbar { width: 4px; }
+        .panel::-webkit-scrollbar-thumb { background: #242433; border-radius: 3px; }
+        .collapsible-header {
+            background: #161622;
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #ffcc00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #242433;
+            margin-top: 4px;
+            margin-bottom: 4px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        @media (hover: hover) {
+            .collapsible-header:hover {
+                background: #1e1e2d;
+                border-color: #333344;
+            }
+        }
+
+        .collapsible-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s ease-out;
+        }
+        .collapsible-content.collapsed { display: none; }
+
+        .upgrade-item, .market-section, .adv-section, .settings-box, .skill-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #101016;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid #1a1a24;
+            gap: 8px;
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .upgrade-item:hover, .market-section:hover, .settings-box:hover, .skill-item:hover {
+                border-color: #2d2d3d;
+                background: #13131c;
+                transform: translateY(-2px);
+            }
+        }
+
+        .adv-section {
+            background: linear-gradient(135deg, #161220 0%, #0a0712 100%);
+            border: 1px solid #5c00e6;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            text-align: center;
+        }
+
+        .adv-title {
+            grid-column: span 2;
+            font-size: 0.8rem;
+            color: #aa77ff;
+            font-weight: bold;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .action-btns { display: flex; flex-direction: column; gap: 4px; }
+
+        .buy-btn, .station-btn, .skin-btn, .trade-btn, .adv-btn, .ctrl-btn, .skill-btn {
+            color: white;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.75rem;
+            min-width: 95px;
+            text-align: center;
+            transition: background 0.2s ease, opacity 0.15s ease, transform 0.1s ease;
+        }
+
+        .buy-btn:active, .station-btn:active, .skin-btn:active, .trade-btn:active, .adv-btn:active, .ctrl-btn:active, .skill-btn:active {
+            transform: scale(0.95);
+        }
+
+        .buy-btn { background: #007c34; }
+        @media (hover: hover) { .buy-btn:hover:not(:disabled) { background: #009c42; } }
+        .station-btn { background: #1844bc; }
+        @media (hover: hover) { .station-btn:hover:not(:disabled) { background: #2f5ee6; } }
+        .skin-btn { background: #6d1b9c; }
+        .skin-btn.equipped { background: #ffcc00; color: #050507; }
+        .trade-btn { background: #c63f17; }
+        .adv-btn { background: linear-gradient(90deg, #5c00e6, #9c00ff); min-width: auto; width: 100%; padding: 8px; }
+        .ctrl-btn { background: #333344; min-width: auto; padding: 6px 12px; }
+        .skill-btn { background: #007c34; }
+
+        .buy-btn:disabled, .station-btn:disabled, .skin-btn:disabled, .trade-btn:disabled, .ctrl-btn:disabled, .skill-btn:disabled {
+            background: #1c1c24;
+            color: #3e3e4a;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .prestige-box {
+            text-align: center;
+            padding: 15px;
+            background: #10081a;
+            border: 1px solid #421280;
+            border-radius: 12px;
+            width: 100%;
+        }
+
+        .rebirth-btn {
+            background: #421280;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .rebirth-btn:hover:not(:disabled) {
+                background: #5319a0;
+                box-shadow: 0 0 15px rgba(83, 25, 160, 0.4);
+            }
+        }
+
+        .rebirth-btn:disabled {
+            background: #1c1c24;
+            color: #3e3e4a;
+            cursor: not-allowed;
+        }
+
+        /* Исправленный адаптивный оверлей случайных инцидентов */
+        .event-overlay {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-250%);
+            width: 90%;
+            max-width: 480px;
+            background: #0f0f14;
+            border: 2px solid #ffcc00;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .event-overlay.active {
+            transform: translateX(-50%) translateY(0);
+        }
+        .event-choice-btn {
+            background: #242433;
+            color: #fff;
+            border: 1px solid #3a3a52;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            width: 100%;
+            text-align: left;
+            transition: background 0.2s;
+        }
+        .event-choice-btn:hover { background: #3a3a52; }
+
+        .floating-text {
+            position: absolute;
+            color: #ffcc00;
+            font-weight: 900;
+            font-size: 1.3rem;
+            pointer-events: none;
+            animation: floatUp 0.6s ease-out forwards;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        }
+        .floating-text.crit {
+            color: #ff3366;
+            font-size: 1.6rem;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        .slot-btn { background: #1c1c24; border: 1px solid #2d2d3d; }
+        .slot-btn.active { background: #ffcc00; color: #050507; border-color: #ffcc00; }
+    </style>
+</head>
+<body>
+    <!-- Уведомление об офлайн-прибыли -->
+    <div id="offline-summary" style="color: #ffcc00; font-size: 0.8rem; text-align: center; font-weight: bold;"></div>
+
+    <!-- Модальное окно случайных событий -->
+    <div id="event-box" class="event-overlay">
+        <h2 id="event-title" style="color: #ffcc00; font-size: 1.1rem; margin-bottom: 6px;"></h2>
+        <p id="event-desc" style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;"></p>
+        <div id="event-choices" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        <div style="font-size: 0.7rem; color: #ff3366; margin-top: 8px; text-align: right;">Осталось: <span id="event-timer-view">60</span>с</div>
+    </div>
+
+    <div class="container">
+        <!-- Баннер активного буста x2 / x3 -->
+        <div id="boost-banner" class="boost-banner"></div>
+
+        <!-- Сетка основных экономических показателей финансовой империи -->
+        <div class="stats-grid">
+            <div class="stat-box" style="border-color: #ffcc00;">
+                <div class="stat-label">Бензин в баке</div>
+                <div class="liters-count" id="gas-amount">0</div>
+            </div>
+            <div class="stat-box" style="border-color: #00ff66;">
+                <div class="stat-label">Капитал (Деньги)</div>
+                <div class="money-count" id="money-amount">$0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Алмазы</div>
+                <div class="stat-value diamond-text" id="diamonds-amount">0 💎</div>
+            </div>
+            <div class="stat-box full-width" style="padding: 6px; display: flex; justify-content: space-around; font-size: 0.75rem;">
+                <div>Доход фабрик: <span id="cps-amount">+0 л/с</span></div>
+                <div>Курс бензина: <span id="gas-rate-display" style="color:#ffcc00; font-weight:bold;">$10</span> (через <span id="gas-timer">90</span>с)</div>
+            </div>
+        </div>
+
+        <!-- Спонсорские контракты (Интеграция Rewarded Video SDK) -->
+        <div class="adv-section">
+            <div class="adv-title">🎬 Спонсорские Контракты (Видеореклама)</div>
+            <div style="padding: 4px;">
+                <button class="adv-btn" onclick="watchAdForMoney()">Получить деньги</button>
+            </div>
+            <div style="padding: 4px;">
+                <button class="adv-btn" onclick="watchAdForGas()">Получить буст x2</button>
+            </div>
+        </div>
+
+        <!-- Главная интерактивная помпа (Клик на ПК дублируется Пробелом) -->
+        <div class="click-area" id="click-area">
+            <button class="click-btn" id="main-click-btn">⛽</button>
+        </div>
+
+        <!-- Система горизонтальных вкладок навигации -->
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-upgrades" onclick="switchTab('upgrades')">Заводы</button>
+            <button class="tab-btn" id="tab-market" onclick="switchTab('market')">Биржа</button>
+            <button class="tab-btn" id="tab-skills" onclick="switchTab('skills')">Навыки</button>
+            <button class="tab-btn" id="tab-skins" onclick="switchTab('skins')">Скины</button>
+            <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">Опции</button>
+        </div>
+        <!-- Вкладка предприятий и скрываемых категорий -->
+        <div id="upgrades-panel" class="panel active">
+            <div class="collapsible-header" onclick="toggleCollapse('standard-upgrades-cat')">
+                <span>🏭 Стандартные предприятия (20 типов)</span>
+                <span id="arrow-standard-upgrades-cat">▼</span>
+            </div>
+            <div id="standard-upgrades-cat" class="collapsible-content">
+                <div id="buildings-container"></div>
+            </div>
+
+            <div class="collapsible-header" onclick="toggleCollapse('super-mines-cat')">
+                <span>💎 Супер-Шахты Синдиката</span>
+                <span id="arrow-super-mines-cat">▼</span>
+            </div>
+            <div id="super-mines-cat" class="collapsible-content">
+                <div id="super-mines-container"></div>
+            </div>
+        </div>
+
+        <!-- Терминалы фондовых и сырьевых рынков -->
+        <div id="market-panel" class="panel">
+            <div class="market-section" style="flex-direction: column; align-items: stretch;">
+                <h3 style="color:#ffcc00; text-align:center; font-size: 0.95rem;">Торговый Терминал - Бензин (Курс $3 - $10)</h3>
+                <p style="font-size:0.75rem; text-align:center; color:#aaa; margin: 2px 0;">Накапливайте цистерны, ждите высокий курс ($9-10) и фиксируйте прибыль!</p>
+                <div style="display:flex; justify-content:space-around; margin: 8px 0;">
+                    <button class="trade-btn" style="flex:1; margin-right:4px; background:#e65100;" onclick="sellGas(0.25)">Продать 25%</button>
+                    <button class="trade-btn" style="flex:1; margin-left:4px; background:#d84315;" onclick="sellGas(1)">Продать ВСЕ</button>
+                </div>
+            </div>
+            
+            <div class="market-section" style="flex-direction: column; align-items: stretch; margin-top:4px;">
+                <h3 style="text-align:center; font-size: 0.95rem;">Фондовый Рынок (11 Акций)</h3>
+                <p style="font-size:0.7rem; color:#aaa; text-align:center;">Курсы акций обновляются автоматически каждые 60 секунд</p>
+                <div id="shares-market-list" style="display:flex; flex-direction:column; gap:6px; margin: 8px 0; width: 100%;"></div>
+                <hr style="border-color:#222; margin:6px 0;">
+                <h3 style="text-align:center; font-size: 0.95rem; color:#b388ff;">Масштабируемые Венчурные Инвестиции</h3>
+                <p style="font-size:0.7rem; color:#aaa; text-align:center; margin-bottom:4px;">Стоимость и выплаты динамически зависят от вашего текущего капитала!</p>
+                <div id="investments-list" style="display:flex; flex-direction:column; gap:6px; margin-top:2px;"></div>
+            </div>
+        </div>
+
+        <div id="skills-panel" class="panel"></div>
+        <div id="skins-panel" class="panel"></div>
+
+        <!-- Модуль проведения престижа и ребитхов -->
+        <div id="prestige-panel" class="panel">
+            <div class="prestige-box">
+                <h2>Слияние Трастов (Ребитх)</h2>
+                <p style="font-size:0.8rem; color:#9898a8; margin: 6px 0;">Продайте текущую корпорацию за деньги. Каждый ребитх разблокирует Супер-Шахты, дает на 1 Алмаз больше и увеличивает глобальный бонус дохода на постоянные +1.25x.</p>
+                <div style="background:#09090c; padding:10px; border-radius:10px; margin:8px 0; border:1px solid #222;">
+                    <div>Текущий уровень ребитха: <span id="rebirth-level-display" style="color:#b388ff; font-weight:bold;">0</span></div>
+                    <div>Глобальный бонус: <span id="rebirth-bonus-display" style="color:#00ff66; font-weight:bold;">1.00x</span></div>
+                </div>
+                <p style="font-weight:bold; margin:6px 0; font-size:1.05rem;">Следующая награда: <span id="pending-diamonds" class="diamond-text">0 💎</span></p>
+                <p style="font-size:0.75rem; color:#ffcc00; margin-bottom:4px;">Требуется денег для следующего ребитха: <span id="rebirth-cost-display" style="font-weight:bold; color:#00ff66;">$10,000</span></p>
+                <button class="rebirth-btn" id="rebirth-btn" onclick="triggerRebirth()">Начать реорганизацию</button>
+            </div>
+        </div>
+
+        <!-- Раздел опций, звуков и 3 независимых слотов сохранения -->
+        <div id="settings-panel" class="panel">
+            <div class="settings-box" style="flex-direction:column; align-items:stretch; gap:10px;">
+                <h3 style="text-align:center; font-size:1rem; color:#ffcc00;">Панель Управления Слотами</h3>
+                
+                <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:5px; margin: 5px 0;">
+                    <button class="slot-btn active" id="slot-0" onclick="changeSaveSlot(0)">Бизнес 1</button>
+                    <button class="slot-btn" id="slot-1" onclick="changeSaveSlot(1)">Бизнес 2</button>
+                    <button class="slot-btn" id="slot-2" onclick="changeSaveSlot(2)">Бизнес 3</button>
+                </div>
+                
+                <hr style="border-color:#222;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span>Эффекты и Сигнализация:</span>
+                    <button class="ctrl-btn" id="btn-sound-toggle" onclick="toggleSound()">ВКЛ</button>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
+                    <button class="ctrl-btn" style="background:#283593;" onclick="save()">Принудительное сохранение</button>
+                    <button class="ctrl-btn" style="background:#c62828;" onclick="hardReset()">Полный сброс прогресса</button>
+                </div>
+                <div style="margin-top:6px; display:flex; flex-direction:column; gap:4px;">
+                    <span style="font-size:0.7rem; color:#777;">Резервный код синхронизации:</span>
+                    <input type="text" id="backup-string-io" style="background:#000; border:1px solid #333; color:#00ff66; padding:4px; font-size:0.65rem; border-radius:4px;" readonly>
+                    <button class="ctrl-btn" style="background:#37474f;" onclick="exportProgress()">Создать бэкап</button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Конец контейнера container -->
+
+    <script>
+        let currentSlot = 0;
+        let soundEnabled = true;
+
+        let game = {
+            gas: 0,
+            money: 15,
+            diamonds: 0,
+            clickLvl: 1,
+            clickCost: 15,
+            rebirths: 0,
+            currentSkin: "default",
+            ownedSkins: ["default"],
+            skills: { critChance: 0, critMult: 0, discount: 0, production: 0, luck: 0, autoclick: 0 },
+            buildings: [],
+            superMines: {
+                coal: { owned: false, count: 0, cost: 500000 },
+                diesel: { owned: false, count: 0, cost: 12000000 },
+                rocket: { owned: false, count: 0, cost: 450000000 },
+                ufo: { owned: false, count: 0, cost: 9000000000 }
+            },
+            shares: {
+                luk: 0, ros: 0, gaz: 0, gzc: 0, nfp: 0, 
+                sib: 0, url: 0, shf: 0, eco: 0, knt: 0, ast: 0
+            },
+            activeInvestments: [],
+            lastSaveTime: Date.now()
+        };
+
+        let activeBoost = { type: "none", mult: 1, time: 0 };
+        let gasRate = 6;
+        let gasTicks = 90;
+        let shareTicks = 60;
+        let eventTimer = 0;
+        let activeEvent = null;
+
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                let now = audioCtx.currentTime;
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(420, now);
+                    osc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now); osc.stop(now + 0.08);
+                } else if (type === 'crit') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(580, now);
+                    osc.frequency.exponentialRampToValueAtTime(850, now + 0.15);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'buy') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(280, now);
+                    osc.frequency.setValueAtTime(380, now + 0.06);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                    osc.start(now); osc.stop(now + 0.12);
+                } else if (type === 'tab') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    gain.gain.setValueAtTime(0.06, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now); osc.stop(now + 0.05);
+                } else if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523, now);
+                    osc.frequency.setValueAtTime(660, now + 0.08);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (type === 'fail') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(170, now);
+                    osc.frequency.linearRampToValueAtTime(85, now + 0.25);
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now); osc.stop(now + 0.25);
+                } else if (type === 'alert') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(440, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                }
+            } catch(e) {}
+        }
+
+        const buildingDefinitions = [
+            { id: 0, name: "Ручной бур во дворе", baseCps: 0.2, baseCost: 15, costMult: 1.15 },
+            { id: 1, name: "Улучшенная лопата", baseCps: 1, baseCost: 100, costMult: 1.16 },
+            { id: 2, name: "Канистровый конвейер", baseCps: 5, baseCost: 1100, costMult: 1.17 },
+            { id: 3, name: "Мини-скважина", baseCps: 22, baseCost: 12000, costMult: 1.18 },
+            { id: 4, name: "Пригородная АЗС", baseCps: 95, baseCost: 130000, costMult: 1.19 },
+            { id: 5, name: "Глубинный насос", baseCps: 450, baseCost: 1400000, costMult: 1.20 },
+            { id: 6, name: "Автоматическая вышка", baseCps: 2300, baseCost: 15000000, costMult: 1.21 },
+            { id: 7, name: "Магистральный нефтепровод", baseCps: 12000, baseCost: 160000000, costMult: 1.22 },
+            { id: 8, name: "Перерабатывающий НПЗ", baseCps: 65000, baseCost: 1700000000, costMult: 1.23 },
+            { id: 9, name: "Флот нефтетанкеров", baseCps: 380000, baseCost: 18000000000, costMult: 1.24 },
+            { id: 10, name: "Арктический шельф", baseCps: 2200000, baseCost: 200000000000, costMult: 1.25 },
+            { id: 11, name: "Подземное хранилище", baseCps: 13000000, baseCost: 2200000000000, costMult: 1.26 },
+            { id: 12, name: "Нефтяная госкорпорация", baseCps: 78000000, baseCost: 25000000000000, costMult: 1.27 },
+            { id: 13, name: "Экспресс-скважина", baseCps: 480000000, baseCost: 300000000000000, costMult: 1.28 },
+            { id: 14, name: "Трансконтинентальный синдикат", baseCps: 2900000000, baseCost: 3600000000000000, costMult: 1.29 },
+            { id: 15, name: "Орбитальный заправщик", baseCps: 18000000000, baseCost: 45000000000000000, costMult: 1.30 },
+            { id: 16, name: "Лунный экстрактор", baseCps: 115000000000, baseCost: 600000000000000000, costMult: 1.31 },
+            { id: 17, name: "Квантовый синтезатор", baseCps: 750000000000, baseCost: 8000000000000000000, costMult: 1.32 },
+            { id: 18, name: "Межгалактический провод", baseCps: 5000000000000, baseCost: 110000000000000000000, costMult: 1.33 },
+            { id: 19, name: "Жидкая сингулярность", baseCps: 35000000000000, baseCost: 1500000000000000000000, costMult: 1.34 }
+        ];
+
+        const superMineDefinitions = {
+            coal: { name: "Угольный Синдикат", reqRebirths: 3, baseCps: 5000, costMult: 1.5 },
+            diesel: { name: "Дизельный Завод Эволюции", reqRebirths: 5, baseCps: 50000, costMult: 1.55 },
+            rocket: { name: "Завод Ракетного Топлива", reqRebirths: 10, baseCps: 1000000, costMult: 1.6 },
+            ufo: { name: "НЛО-Плазменный Конвейер", reqRebirths: 20, baseCps: 50000000, costMult: 1.65 }
+        };
+
+        const shareDefinitions = [
+            { key: "luk", name: "ПАО ЛУКОЙЛ", basePrice: 120, price: 120 },
+            { key: "ros", name: "ПАО Роснефть", basePrice: 90, price: 90 },
+            { key: "gaz", name: "ПАО Газпром", basePrice: 65, price: 65 },
+            { key: "gzc", name: "Газпромнефть", basePrice: 110, price: 110 },
+            { key: "nfp", name: "РН-Нефтепродукт", basePrice: 25, price: 25 },
+            { key: "sib", name: "Сибнефтегаз", basePrice: 45, price: 45 },
+            { key: "url", name: "УралТрансНефть", basePrice: 180, price: 180 },
+            { key: "shf", name: "Шельф-Ресурс", basePrice: 320, price: 320 },
+            { key: "eco", name: "ЭкоТопливо-Групп", basePrice: 15, price: 15 },
+            { key: "knt", name: "КвантРесурс Системс", basePrice: 550, price: 550 },
+            { key: "ast", name: "АстроНафта Траст", basePrice: 1250, price: 1250 }
+        ];
+
+        const skillDefinitions = [
+            { key: "critChance", name: "🎯 Шанс Крита", desc: "+2% к вероятности критического клика", cost: 5, max: 10 },
+            { key: "critMult", name: "💥 Сила Крита", desc: "+1.0x к базовому критическому урону клика", cost: 6, max: 10 },
+            { key: "discount", name: "📉 Скидка магната", desc: "-4% от цены всех фабрик и заводов за уровень", cost: 8, max: 5 },
+            { key: "production", name: "⚙️ Оптимизация линий", desc: "+15% к эффективности пассивного дохода заводов", cost: 10, max: 10 },
+            { key: "luck", name: "🍀 Удача Синдиката", desc: "Случайные инциденты происходят чаще на 25 секунд", cost: 12, max: 5 },
+            { key: "autoclick", name: "🤖 Автокликер-Бот", desc: "Эмулирует пассивно 1 клик/сек за каждый уровень", cost: 15, max: 10 }
+        ];
+
+        const skinDefinitions = [
+            { id: "default", name: "Стандартная колонка", icon: "⛽", mult: 1, cost: 0 },
+            { id: "gold", name: "Золотая VIP-Цистерна", icon: "📀", mult: 2.5, cost: 35 },
+            { id: "plasma", name: "Плазменный Экстрактор", icon: "🔮", mult: 6.0, cost: 120 }
+        ];
+
+        const investmentPlans = [
+            { id: 0, name: "Краткосрочный фьючерс нефти", costPercent: 0.15, roiPercent: 160, duration: 30 },
+            { id: 1, name: "Венчурный стартап катализаторов", costPercent: 0.35, roiPercent: 250, duration: 60 },
+            { id: 2, name: "Трансконтинентальный контракт", costPercent: 0.60, roiPercent: 400, duration: 120 }
+        ];
+        function createDefaultBuildings() {
+            return buildingDefinitions.map(b => ({
+                id: b.id, count: 0, cost: b.baseCost, stationLvl: 1, stationCost: Math.round(b.baseCost * 2.5)
+            }));
+        }
+
+        function initData() {
+            if (!game.buildings || game.buildings.length !== buildingDefinitions.length) {
+                game.buildings = createDefaultBuildings();
+            }
+            if (!game.activeInvestments) game.activeInvestments = [];
+            if (!game.ownedSkins) game.ownedSkins = ["default"];
+            if (!game.superMines) {
+                game.superMines = {
+                    coal: { owned: false, count: 0, cost: 500000 },
+                    diesel: { owned: false, count: 0, cost: 12000000 },
+                    rocket: { owned: false, count: 0, cost: 450000000 },
+                    ufo: { owned: false, count: 0, cost: 9000000000 }
+                };
+            }
+            if (!game.shares) {
+                game.shares = { luk: 0, ros: 0, gaz: 0, gzc: 0, nfp: 0, sib: 0, url: 0, shf: 0, eco: 0, knt: 0, ast: 0 };
+            }
+        }
+
+        function loadGameFromSlot(slot) {
+            currentSlot = slot;
+            let keyName = "gasTycoonSlot_" + slot;
+            if (localStorage.getItem(keyName)) {
+                try {
+                    let loaded = JSON.parse(localStorage.getItem(keyName));
+                    if (loaded && typeof loaded === "object") {
+                        game = { ...game, ...loaded };
+                    }
+                } catch (e) {}
+            } else {
+                game = {
+                    gas: 0, money: 0, diamonds: 0, clickLvl: 1, clickCost: 15, rebirths: 0,
+                    currentSkin: "default", ownedSkins: ["default"],
+                    skills: { critChance: 0, critMult: 0, discount: 0, production: 0, luck: 0, autoclick: 0 },
+                    buildings: createDefaultBuildings(),
+                    superMines: {
+                        coal: { owned: false, count: 0, cost: 500000 },
+                        diesel: { owned: false, count: 0, cost: 12000000 },
+                        rocket: { owned: false, count: 0, cost: 450000000 },
+                        ufo: { owned: false, count: 0, cost: 9000000000 }
+                    },
+                    shares: { luk: 0, ros: 0, gaz: 0, gzc: 0, nfp: 0, sib: 0, url: 0, shf: 0, eco: 0, knt: 0, ast: 0 },
+                    activeInvestments: [],
+                    lastSaveTime: Date.now()
+                };
+            }
+            initData();
+            document.querySelectorAll('.slot-btn').forEach((btn, idx) => {
+                if (idx === currentSlot) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+
+        function save() {
+            game.lastSaveTime = Date.now();
+            localStorage.setItem("gasTycoonSlot_" + currentSlot, JSON.stringify(game));
+        }
+
+        function hardReset() {
+            if (confirm("🚨 ВНИМАНИЕ! Вы полностью сотрете текущую ветку бизнеса в этом слоте. Начать всё с чистого листа?")) {
+                localStorage.removeItem("gasTycoonSlot_" + currentSlot);
+                loadGameFromSlot(currentSlot);
+                buildPanels();
+                renderSharesMarket();
+                updateUI();
+            }
+        }
+        const format = (num) => {
+            if (num < 1000) return Math.floor(num);
+            const exp = [
+                { val: 1e21, sym: "Sx" }, { val: 1e18, sym: "Qi" }, { val: 1e15, sym: "Qa" },
+                { val: 1e12, sym: "T" }, { val: 1e9, sym: "B" }, { val: 1e6, sym: "M" }, { val: 1e3, sym: "K" }
+            ];
+            for (let i = 0; i < exp.length; i++) {
+                if (num >= exp[i].val) return (num / exp[i].val).toFixed(2) + exp[i].sym;
+            }
+            return Math.floor(num);
+        };
+
+        const getDiscount = () => 1 - (game.skills.discount * 0.04);
+        const getProductionBonus = () => 1 + (game.skills.production * 0.15);
+        const getSkinMult = () => skinDefinitions.find(s => s.id === game.currentSkin)?.mult || 1;
+        const getRebirthMult = () => 1 + (game.rebirths * 1.25);
+        
+        const getRebirthCost = () => {
+            return 10000 * Math.pow(5, game.rebirths);
+        };
+
+        const getBuildingCps = (bState) => {
+            let def = buildingDefinitions[bState.id];
+            let stationMult = 1 + (bState.stationLvl - 1) * 0.5;
+            return def.baseCps * bState.count * stationMult * getProductionBonus() * getSkinMult() * getRebirthMult();
+        };
+
+        const getSuperMineCps = () => {
+            let total = 0;
+            for (let key in game.superMines) {
+                if (game.superMines[key].owned) {
+                    total += superMineDefinitions[key].baseCps * game.superMines[key].count;
+                }
+            }
+            return total * getProductionBonus() * getSkinMult() * getRebirthMult();
+        };
+
+        const getCps = () => {
+            let total = game.buildings.reduce((sum, b) => sum + getBuildingCps(b), 0) + getSuperMineCps();
+            if (activeBoost.type === "all") total *= activeBoost.mult;
+            return total;
+        };
+
+        const getClickPower = () => {
+            let base = (game.clickLvl + game.buildings.reduce((sum, b) => sum + b.count, 0) * 0.2) * getSkinMult() * getRebirthMult();
+            if (activeBoost.type === "click") base *= activeBoost.mult;
+            return Math.max(1, Math.floor(base));
+        };
+
+        function processOfflineProgress() {
+            let passed = Math.floor((Date.now() - game.lastSaveTime) / 1000);
+            if (passed > 30) {
+                let simulatedCps = getCps();
+                let earnedGas = simulatedCps * passed * 0.05;
+                if (earnedGas > 0) {
+                    game.gas += earnedGas;
+                    document.getElementById("offline-summary").textContent = `В офлайне добыто: +${format(earnedGas)} л бензина (за ${passed}с)`;
+                    setTimeout(() => { document.getElementById("offline-summary").textContent = ""; }, 8000);
+                }
+            }
+        }
+
+        function switchTab(tab) {
+            playSound('tab');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${tab}-panel`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        function toggleCollapse(containerId) {
+            playSound('tab');
+            const content = document.getElementById(containerId);
+            const arrow = document.getElementById('arrow-' + containerId);
+            if (content.classList.contains('collapsed')) {
+                content.classList.remove('collapsed');
+                if (arrow) arrow.textContent = '▼';
+            } else {
+                content.classList.add('collapsed');
+                if (arrow) arrow.textContent = '▲';
+            }
+        }
+        function buildPanels() {
+            const bContainer = document.getElementById("buildings-container");
+            if (bContainer) {
+                bContainer.innerHTML = `
+                    <div class="upgrade-item">
+                        <div class="upgrade-info"><h3>Насосный рычаг (Клик)</h3><p>Сила: <span id="c-power">1</span> л (Ур. <span id="c-lvl">1</span>)</p></div>
+                        <div class="action-btns"><button class="buy-btn" id="btn-u-click" onclick="buyClick()">0 л</button></div>
+                    </div>
+                `;
+                
+                buildingDefinitions.forEach(b => {
+                    bContainer.innerHTML += `
+                        <div class="upgrade-item">
+                            <div class="upgrade-info"><h3>${b.name}</h3><p>Доход: +${format(b.baseCps * getSkinMult() * getRebirthMult())} л/с | Колич: <span id="b-cnt-${b.id}">0</span></p><p style="color:#66ff99; font-size:0.7rem;">Энергостанция: Ур. <span id="b-st-${b.id}">1</span> (+50% к л/с)</p></div>
+                            <div class="action-btns"><button class="buy-btn" id="btn-b-${b.id}" onclick="buyBuilding(${b.id})">0 л</button><button class="station-btn" id="btn-st-${b.id}" onclick="upgradeStation(${b.id})">⚡ Ур+: 0 л</button></div>
+                        </div>
+                    `;
+                });
+            }
+
+            const mContainer = document.getElementById("super-mines-container");
+            if (mContainer) {
+                mContainer.innerHTML = "";
+                for (let key in superMineDefinitions) {
+                    let m = superMineDefinitions[key];
+                    let lockText = game.rebirths >= m.reqRebirths ? "" : ` style="display:none;"`;
+                    mContainer.innerHTML += `
+                        <div class="upgrade-item" id="mine-card-${key}"${lockText} style="border-color:#4a148c; background: linear-gradient(135deg, #0d0614 0%, #121218 100%); width:100%;">
+                            <div class="upgrade-info">
+                                <h3 style="color:#b388ff;">${m.name}</h3>
+                                <p>Базовый доход: +${format(m.baseCps * getSkinMult() * getRebirthMult())} л/с | Куплено: <span id="m-cnt-${key}">0</span></p>
+                            </div>
+                            <div class="action-btns">
+                                <button class="buy-btn" style="background:#4a148c;" id="btn-m-${key}" onclick="buySuperMine('${key}')">0 л</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            const skillPanel = document.getElementById("skills-panel");
+            if (skillPanel) {
+                skillPanel.innerHTML = "";
+                skillDefinitions.forEach(s => {
+                    skillPanel.innerHTML += `<div class="skill-item" style="display:flex; justify-content:space-between; align-items:center; background:#15151f; padding:10px 15px; border-radius:10px; border:1px solid #1f1f2a; width:100%;"><div><h3>${s.name}</h3><p>${s.desc}</p><p style="color:#00ccff; font-size:0.75rem;">Уровень: <span id="sk-lvl-${s.key}">0</span> / ${s.max}</p></div><button class="skill-btn" id="btn-sk-${s.key}" onclick="buySkill('${s.key}')">0 💎</button></div>`;
+                });
+            }
+
+            const skinsPanel = document.getElementById("skins-panel");
+            if (skinsPanel) {
+                skinsPanel.innerHTML = "";
+                skinDefinitions.forEach(s => {
+                    skinsPanel.innerHTML += `<div class="upgrade-item" style="width:100%;"><div class="upgrade-info"><h3>${s.icon} ${s.name}</h3><p>Эффект: Модификатор производства <b>x${s.mult}</b></p></div><div class="action-btns"><button class="skin-btn" id="btn-skn-${s.id}" onclick="selectSkin('${s.id}')">Купить</button></div></div>`;
+                });
+            }
+        }
+        function updateUI() {
+            document.getElementById("gas-amount").textContent = format(game.gas);
+            document.getElementById("money-amount").textContent = "\$" + format(game.money);
+            document.getElementById("diamonds-amount").textContent = game.diamonds + " 💎";
+            document.getElementById("cps-amount").textContent = "+" + format(getCps()) + " л/с";
+            document.getElementById("c-power").textContent = format(getClickPower());
+            document.getElementById("c-lvl").textContent = game.clickLvl;
+            document.getElementById("gas-rate-display").textContent = "\$" + gasRate;
+            document.getElementById("gas-timer").textContent = Math.ceil(gasTicks);
+            document.getElementById("rebirth-level-display").textContent = game.rebirths;
+            document.getElementById("rebirth-bonus-display").textContent = getRebirthMult().toFixed(2) + "x";
+
+            let btnClick = document.getElementById("btn-u-click");
+            if (btnClick) {
+                btnClick.textContent = format(game.clickCost) + " л";
+                btnClick.disabled = game.gas < game.clickCost;
+            }
+
+            let mainIcon = skinDefinitions.find(s => s.id === game.currentSkin)?.icon || "⛽";
+            document.getElementById("main-click-btn").textContent = mainIcon;
+
+            game.buildings.forEach(b => {
+                let discCost = Math.max(1, Math.round(b.cost * getDiscount()));
+                let cntEl = document.getElementById(`b-cnt-${b.id}`);
+                let stEl = document.getElementById(`b-st-${b.id}`);
+                let bBtn = document.getElementById(`btn-b-${b.id}`);
+                let sBtn = document.getElementById(`btn-st-${b.id}`);
+                
+                if (cntEl) cntEl.textContent = b.count;
+                if (stEl) stEl.textContent = b.stationLvl;
+                if (bBtn) {
+                    bBtn.textContent = format(discCost) + " л";
+                    bBtn.disabled = game.gas < discCost;
+                }
+                if (sBtn) {
+                    sBtn.textContent = "⚡ Ур+: " + format(b.stationCost) + " л";
+                    sBtn.disabled = game.gas < b.stationCost;
+                }
+            });
+
+            for (let key in game.superMines) {
+                let mState = game.superMines[key];
+                let mDef = superMineDefinitions[key];
+                let card = document.getElementById(`mine-card-${key}`);
+                if (card) {
+                    if (game.rebirths >= mDef.reqRebirths) card.style.display = "flex";
+                    else card.style.display = "none";
+                }
+                let cntEl = document.getElementById(`m-cnt-${key}`);
+                if (cntEl) cntEl.textContent = mState.count;
+                let mBtn = document.getElementById(`btn-m-${key}`);
+                if (mBtn) {
+                    mBtn.textContent = format(mState.cost) + " л";
+                    mBtn.disabled = game.gas < mState.cost;
+                }
+            }
+
+            skillDefinitions.forEach(s => {
+                let lvl = game.skills[s.key] || 0;
+                let cost = s.cost * (lvl + 1);
+                let lvlEl = document.getElementById(`sk-lvl-${s.key}`);
+                if (lvlEl) lvlEl.textContent = lvl;
+                let sBtn = document.getElementById(`btn-sk-${s.key}`);
+                if (sBtn) {
+                    sBtn.textContent = lvl >= s.max ? "МАКС" : `${cost} 💎`;
+                    sBtn.disabled = lvl >= s.max || game.diamonds < cost;
+                }
+            });
+
+            skinDefinitions.forEach(s => {
+                let btn = document.getElementById(`btn-skn-${s.id}`);
+                if (!btn) return;
+                if (game.currentSkin === s.id) {
+                    btn.textContent = "Надет";
+                    btn.className = "skin-btn equipped";
+                    btn.disabled = true;
+                } else if (game.ownedSkins.includes(s.id)) {
+                    btn.textContent = "Выбрать";
+                    btn.className = "skin-btn";
+                    btn.disabled = false;
+                } else {
+                    btn.textContent = `${s.cost} 💎`;
+                    btn.className = "skin-btn";
+                    btn.disabled = game.diamonds < s.cost;
+                }
+            });
+
+            let rCost = getRebirthCost();
+            document.getElementById("rebirth-cost-display").textContent = "\$" + format(rCost);
+            document.getElementById("rebirth-btn").disabled = game.money < rCost;
+
+            let pending = Math.floor(Math.log10(Math.max(1, game.money)) * 1.5) + 1;
+            if (game.money < rCost) pending = 0;
+            document.getElementById("pending-diamonds").textContent = pending + " 💎";
+
+            let banner = document.getElementById("boost-banner");
+            if (banner) {
+                if (activeBoost.time > 0) {
+                    banner.style.display = "block";
+                    banner.textContent = `БУСТ: Экстра-Множитель x${activeBoost.mult} (${Math.ceil(activeBoost.time)}с)`;
+                } else {
+                    banner.style.display = "none";
+                }
+            }
+            renderInvestmentsList();
+        }
+
+        function renderSharesMarket() {
+            const container = document.getElementById("shares-market-list");
+            if (!container) return; container.innerHTML = "";
+            shareDefinitions.forEach(s => {
+                let owned = game.shares[s.key] || 0;
+                container.innerHTML += `
+                    <div class="upgrade-item" style="background:#09090c; padding: 6px 10px; width:100%;">
+                        <div class="upgrade-info"><h4>${s.name}</h4><p style="font-size:0.75rem;">Цена: <b style="color:#ffcc00;">$${format(s.price)}</b> | Портфель: <b>${owned}</b> шт.</p></div>
+                        <div style="display:flex; gap:3px;"><button class="buy-btn" style="min-width:55px; padding:4px;" onclick="buyShareItem('${s.key}')">Купить</button><button class="trade-btn" style="min-width:55px; padding:4px; background:#b71c1c;" onclick="sellShareItem('${s.key}')">Продать</button></div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderInvestmentsList() {
+            const invContainer = document.getElementById("investments-list");
+            if (!invContainer) return; invContainer.innerHTML = "";
+            investmentPlans.forEach(p => {
+                let active = game.activeInvestments.find(x => x.id === p.id);
+                let dynamicCost = Math.round(game.money * p.costPercent);
+                if (dynamicCost < 15) dynamicCost = 15;
+                let statusText = active ? `<span style="color:#00ff66;">Активен: ${Math.ceil(active.remains)}с</span>` : "Доступен";
+                let btnDisabled = active || game.money < dynamicCost ? "disabled" : "";
+                invContainer.innerHTML += `
+                    <div class="upgrade-item" style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+                        <div class="item-info"><h4>${p.name}</h4><span>Доход: +${p.roiPercent}% через ${p.duration}с | ${statusText}</span></div>
+                        <button class="trade-btn" ${btnDisabled} onclick="startInvestment(${p.id}, ${dynamicCost})" style="background: #1844bc; min-width: 110px;">
+                            ${active ? "В процессе" : "$" + format(dynamicCost)}
+                        </button>
+                    </div>`;
+            });
+        }
+        function buyClick() { initAudio(); if (game.gas >= game.clickCost) { playSound('buy'); game.gas -= game.clickCost; game.clickLvl++; game.clickCost = Math.round(game.clickCost * 1.45); updateUI(); save(); } }
+        function buyBuilding(id) { initAudio(); let b = game.buildings[id]; let cost = Math.max(1, Math.round(b.cost * getDiscount())); if (game.gas >= cost) { playSound('buy'); game.gas -= cost; b.count++; b.cost = Math.round(b.cost * buildingDefinitions[id].costMult); updateUI(); save(); } }
+        function upgradeStation(id) { initAudio(); let b = game.buildings[id]; if (game.gas >= b.stationCost) { playSound('buy'); game.gas -= b.stationCost; b.stationLvl++; b.stationCost = Math.round(b.stationCost * 3.2); updateUI(); save(); } }
+        function buySuperMine(key) { initAudio(); let m = game.superMines[key]; if (game.gas >= m.cost) { playSound('buy'); game.gas -= m.cost; m.owned = true; m.count++; m.cost = Math.round(m.cost * superMineDefinitions[key].costMult); updateUI(); save(); } }
+        function buySkill(key) { initAudio(); let s = skillDefinitions.find(x => x.key === key); let lvl = game.skills[key] || 0; let cost = s.cost * (lvl + 1); if (game.diamonds >= cost && lvl < s.max) { playSound('buy'); game.diamonds -= cost; game.skills[key] = lvl + 1; updateUI(); save(); } }
+        function selectSkin(id) { initAudio(); let s = skinDefinitions.find(x => x.id === id); if (game.ownedSkins.includes(id)) { game.currentSkin = id; playSound('buy'); } else if (game.diamonds >= s.cost) { playSound('buy'); game.diamonds -= s.cost; game.ownedSkins.push(id); game.currentSkin = id; } buildPanels(); updateUI(); save(); }
+        function sellGas(pct) { initAudio(); let amt = game.gas * pct; if (amt > 0) { playSound('success'); game.money += amt * gasRate; game.gas -= amt; updateUI(); save(); } }
+        function buyShareItem(key) { initAudio(); let s = shareDefinitions.find(x => x.key === key); if (game.money >= s.price) { playSound('buy'); game.money -= s.price; game.shares[key] = (game.shares[key] || 0) + 1; updateUI(); renderSharesMarket(); save(); } }
+        function sellShareItem(key) { initAudio(); let s = shareDefinitions.find(x => x.key === key); if (game.shares[key] > 0) { playSound('success'); game.money += s.price; game.shares[key]--; updateUI(); renderSharesMarket(); save(); } }
+        function startInvestment(id, cost) { initAudio(); if (game.money >= cost && !game.activeInvestments.some(x => x.id === id)) { playSound('buy'); game.money -= cost; game.activeInvestments.push({ id: id, remains: investmentPlans.find(x => x.id === id).duration, investedAmount: cost }); updateUI(); save(); } }
+
+        function resolveInvestment(id, investedAmount) {
+            let plan = investmentPlans.find(x => x.id === id); let rand = Math.random() * 100; let resultText = "";
+            if (rand < 40) { playSound('fail'); resultText = `❌ Инвестиция прогорела! Вы потеряли $${format(investedAmount)} в ${plan.name}.`; } 
+            else if (rand < 55) { playSound('click'); game.money += investedAmount; resultText = `😐 Проект в ноль. Вернулись ваши $${format(investedAmount)}.`; } 
+            else if (rand < 85) { playSound('success'); let payout = Math.round(investedAmount * 1.6); game.money += payout; resultText = `✅ Успех! Прибыль с проекта: +$${format(payout)}.`; } 
+            else { playSound('crit'); let mult = 3 + Math.floor(Math.random() * 3); let payout = investedAmount * mult; game.money += payout; resultText = `🔥 МЕГА-ПРИБЫЛЬ на x${mult}! Вы заработали: +$${format(payout)}!`; }
+            alert(resultText);
+        }
+
+        function triggerRebirth() {
+            let cost = getRebirthCost();
+            if (game.money >= cost) {
+                let pending = Math.floor(Math.log10(game.money) * 1.5) + 1;
+                game.rebirths++;
+                game.diamonds += pending;
+                game.money = 15;
+                game.gas = 0;
+                game.clickLvl = 1;
+                game.clickCost = 15;
+                game.buildings = createDefaultBuildings();
+                game.activeInvestments = [];
+                for (let key in game.superMines) {
+                    game.superMines[key] = { owned: false, count: 0, cost: superMineDefinitions[key].baseCost || 500000 };
+                }
+                game.shares = { luk: 0, ros: 0, gaz: 0, gzc: 0, nfp: 0, sib: 0, url: 0, shf: 0, eco: 0, knt: 0, ast: 0 };
+                playSound('success');
+                alert(`🌌 Слияние Трастов завершено! Вы получили ${pending} 💎 и глобальный мультипликатор.`);
+                buildPanels();
+                renderSharesMarket();
+                updateUI();
+                save();
+            }
+        }
+
+        function changeSaveSlot(slot) { save(); loadGameFromSlot(slot); buildPanels(); renderSharesMarket(); updateUI(); }
+        function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("btn-sound-toggle").textContent = soundEnabled ? "ВКЛ" : "ВЫКЛ"; }
+        function exportProgress() { document.getElementById("backup-string-io").value = btoa(encodeURIComponent(JSON.stringify(game))); alert("Код бэкапа сгенерирован в текстовом полях опций!"); }
+
+        function watchAdForMoney() { alert("📺 Спонсорский ролик просмотрен! Начислено \$500."); game.money += 500; updateUI(); save(); }
+        function watchAdForGas() { alert("📺 Спонсорский ролик просмотрен! Множитель x2 активен на 30 сек."); activeBoost = { type: "all", mult: 2, time: 30 }; updateUI(); save(); }
+        document.getElementById("main-click-btn").addEventListener("click", (e) => {
+            initAudio(); playSound('click');
+            let ch = 0.02 + (game.skills.critChance * 0.02); let isCrit = Math.random() < ch;
+            let pwr = getClickPower(); if (isCrit) pwr *= (4 + game.skills.critMult); game.gas += pwr;
+            
+            let f = document.createElement("div"); f.className = "floating-text" + (isCrit ? " crit" : ""); f.textContent = (isCrit ? "КРИТ! +" : "+") + format(pwr);
+            if (e.clientX) {
+                f.style.left = `${e.clientX - 20}px`; f.style.top = `${e.clientY - 20}px`;
+            } else {
+                let rx = (Math.random() - 0.5) * 60; f.style.left = `calc(50% + ${rx}px)`; f.style.top = "40px";
+            }
+            document.body.appendChild(f); setTimeout(() => f.remove(), 600);
+            updateUI();
+        });
+
+        window.addEventListener("keydown", (e) => {
+            if (e.code === "Space") { e.preventDefault(); document.getElementById("main-click-btn").click(); }
+        });
+
+        const pool = [
+            { t: "Забастовка на вышке!", d: "Бурильщики требуют премию. У вас есть 60 секунд.", c: [{ n: "Выплатить премию (-10% капитала)", a: () => { game.money -= game.money * 0.1; } }, { n: "Отказать (Урезать доход на 50% на 20с)", a: () => { activeBoost = { type: "all", mult: 0.5, time: 20 }; } }] },
+            { t: "Аудит налоговой инспекции", d: "Ревизоры проверяют декларацию синдиката.", c: [{ n: "Уладить аудит (Налог: -5% от всех денег)", a: () => { game.money -= game.money * 0.05; } }, { n: "Рискнуть (Шанс 50/50: Штраф 30% капитала или пронесет)", a: () => { if(Math.random()<0.5) game.money -= game.money*0.3; } }] },
+            { t: "Углеродный катализатор!", d: "Ученые открыли присадку, ускоряющую распад топлива.", c: [{ n: "Залить в баки (x3 к доходу на 30с)", a: () => { activeBoost = { type: "all", mult: 3, time: 30 }; } }] },
+            { t: "Государственный грант!", d: "Министерство выделило субсидии успешным синдикатам.", c: [{ n: "Получить грант (+15% к деньгам)", a: () => { game.money += game.money * 0.15; } }] }
+        ];
+
+        function triggerEvent() {
+            if (document.getElementById("event-box").classList.contains("active")) return;
+            playSound('alert'); activeEvent = pool[Math.floor(Math.random() * pool.length)];
+            document.getElementById("event-title").textContent = activeEvent.t;
+            document.getElementById("event-desc").textContent = activeEvent.d;
+            eventTimer = 60;
+            let container = document.getElementById("event-choices"); container.innerHTML = "";
+            activeEvent.c.forEach(ch => {
+                let btn = document.createElement("button"); btn.className = "event-choice-btn"; btn.textContent = ch.n;
+                btn.onclick = () => { ch.a(); closeEventWindow(); }; container.appendChild(btn);
+            });
+            document.getElementById("event-box").classList.add("active");
+        }
+
+        function closeEventWindow() { document.getElementById("event-box").classList.remove("active"); eventTimer = 0; updateUI(); save(); }
+
+        setInterval(() => {
+            let cps = getCps(); if (cps > 0) game.gas += cps / 10;
+            if (game.skills.autoclick > 0) game.gas += (getClickPower() * game.skills.autoclick) / 10;
+            if (activeBoost.time > 0) { activeBoost.time = Math.max(0, (activeBoost.time - 0.1).toFixed(1)); if (activeBoost.time == 0) activeBoost = { type: "none", mult: 1, time: 0 }; }
+            if (document.getElementById("event-box").classList.contains("active")) { eventTimer -= 0.1; document.getElementById("event-timer-view").textContent = Math.ceil(eventTimer); if (eventTimer <= 0) closeEventWindow(); }
+            
+            gasTicks -= 0.1;
+            if (gasTicks <= 0) { gasRate = Math.floor(3 + Math.random() * 8); gasTicks = 90; }
+            
+            game.activeInvestments.forEach((inv, index) => {
+                inv.remains -= 0.1;
+                if (inv.remains <= 0) { resolveInvestment(inv.id, inv.investedAmount); game.activeInvestments.splice(index, 1); }
+            });
+            updateUI();
+        }, 100);
+
+        setInterval(() => {
+            shareDefinitions.forEach(s => { s.price = Math.max(10, Math.round(s.basePrice * (0.5 + Math.random() * 1.25))); });
+            renderSharesMarket();
+        }, 60000);
+
+        function scheduleNextEvent() {
+            let interval = 180000 + Math.random() * 240000;
+            setTimeout(() => { triggerEvent(); scheduleNextEvent(); }, Math.max(45000, interval - (game.skills.luck * 25000)));
+        }
+
+        setInterval(save, 5000);
+
+        loadGameFromSlot(0);
+        buildPanels();
+        processOfflineProgress();
+        renderSharesMarket();
+        updateUI();
+        scheduleNextEvent();
+    </script>
+</body>
+</html>
