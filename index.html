@@ -28,25 +28,6 @@
             overflow-x: hidden;
         }
 
-        header {
-            text-align: center;
-            margin-bottom: 10px;
-            width: 100%;
-            max-width: 750px;
-        }
-
-        h1 {
-            color: #ffcc00;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
-            font-size: 1.5rem;
-            letter-spacing: 0.5px;
-            transition: transform 0.3s ease;
-        }
-
-        h1:hover {
-            transform: scale(1.02);
-        }
-
         .container {
             display: flex;
             flex-direction: column;
@@ -120,9 +101,10 @@
 
         .diamond-text { color: #00ccff; font-weight: 800; }
         .money-text { color: #00ff66; }
+        
         .boost-banner {
             display: none;
-            background: linear-gradient(90deg, #ff3366, #ff00cc);
+            background: linear-gradient(90deg, #00b8d4, #0097a7);
             color: white;
             padding: 6px;
             border-radius: 8px;
@@ -135,7 +117,7 @@
 
         @keyframes pulseBanner {
             0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+            50% { transform: scale(1.02); opacity: 1; box-shadow: 0 0 15px rgba(0, 184, 212, 0.5); }
             100% { transform: scale(1); opacity: 0.9; }
         }
 
@@ -177,7 +159,7 @@
 
         .tabs {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 4px;
             margin-bottom: 12px;
         }
@@ -222,6 +204,7 @@
         .panel.active { display: flex; }
         .panel::-webkit-scrollbar { width: 4px; }
         .panel::-webkit-scrollbar-thumb { background: #242433; border-radius: 3px; }
+        
         .collapsible-header {
             background: #161622;
             padding: 10px 15px;
@@ -320,6 +303,7 @@
         .skin-btn.equipped { background: #ffcc00; color: #050507; }
         .trade-btn { background: #c63f17; }
         .adv-btn { background: linear-gradient(90deg, #5c00e6, #9c00ff); min-width: auto; width: 100%; padding: 8px; }
+        .adv-btn.boost { background: linear-gradient(90deg, #00838f, #00acc1); }
         .ctrl-btn { background: #333344; min-width: auto; padding: 6px 12px; }
         .skill-btn { background: #007c34; }
 
@@ -415,7 +399,7 @@
             0% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-50px); }
         }
-        .slot-btn { background: #1c1c24; border: 1px solid #2d2d3d; }
+        .slot-btn { background: #1c1c24; border: 1px solid #2d2d3d; color: #fff; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .slot-btn.active { background: #ffcc00; color: #050507; border-color: #ffcc00; }
     </style>
 </head>
@@ -454,10 +438,10 @@
         <div class="adv-section">
             <div class="adv-title">🎬 Спонсорские Контракты (Видеореклама)</div>
             <div style="padding: 4px;">
-                <button class="adv-btn" onclick="watchAdForMoney()">Получить деньги (<span id="ad-money-reward">500</span>$)</button>
+                <button class="adv-btn" onclick="watchAdForMoney()">💵 Деньги (<span id="ad-money-reward">500</span>$)</button>
             </div>
             <div style="padding: 4px;">
-                <button class="adv-btn" onclick="watchAdForGas()">Получить буст x2 (<span id="ad-boost-reward">1000</span>$)</button>
+                <button class="adv-btn boost" onclick="watchAdForGasBoost()">⛽ Буст x1.5 Бензин (60с)</button>
             </div>
         </div>
 
@@ -466,11 +450,12 @@
         </div>
 
         <div class="tabs">
-            <button class="tab-btn active" id="tab-upgrades" onclick="switchTab('upgrades')">Заводы</button>
-            <button class="tab-btn" id="tab-market" onclick="switchTab('market')">Биржа</button>
-            <button class="tab-btn" id="tab-skills" onclick="switchTab('skills')">Навыки</button>
-            <button class="tab-btn" id="tab-skins" onclick="switchTab('skins')">Скины</button>
-            <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">Опции</button>
+            <button class="tab-btn active" id="tab-upgrades" onclick="switchTab('upgrades')">🏭 Заводы</button>
+            <button class="tab-btn" id="tab-market" onclick="switchTab('market')">📈 Биржа</button>
+            <button class="tab-btn" id="tab-skills" onclick="switchTab('skills')">🧠 Навыки</button>
+            <button class="tab-btn" id="tab-skins" onclick="switchTab('skins')">👕 Скины</button>
+            <button class="tab-btn" id="tab-prestige" onclick="switchTab('prestige')">🔄 Ребитх</button>
+            <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">⚙️ Настройки</button>
         </div>
         
         <div id="upgrades-panel" class="panel active">
@@ -487,13 +472,14 @@
                 <span id="arrow-super-mines-cat">▼</span>
             </div>
             <div id="super-mines-cat" class="collapsible-content">
+                <p style="font-size:0.7rem; color:#aaa; text-align:center; margin-bottom:5px;">Требуются Ребитхи: 3, 5, 10 и 20</p>
                 <div id="super-mines-container"></div>
             </div>
         </div>
 
         <div id="market-panel" class="panel">
             <div class="market-section" style="flex-direction: column; align-items: stretch;">
-                <h3 style="color:#ffcc00; text-align:center; font-size: 0.95rem;">Торговый Терминал - Бензин (Разброс курса зависит от Ребитхов!)</h3>
+                <h3 style="color:#ffcc00; text-align:center; font-size: 0.95rem;">Торговый Терминал - Бензин (Разброс курса растет с Ребитхами!)</h3>
                 <p style="font-size:0.75rem; text-align:center; color:#aaa; margin: 2px 0;">Накапливайте цистерны, ждите высокий курс и фиксируйте прибыль!</p>
                 <div style="display:flex; justify-content:space-around; margin: 8px 0;">
                     <button class="trade-btn" style="flex:1; margin-right:4px; background:#e65100;" onclick="sellGas(0.25)">Продать 25%</button>
@@ -523,7 +509,7 @@
                     <div>Текущий уровень ребитха: <span id="rebirth-level-display" style="color:#b388ff; font-weight:bold;">0</span></div>
                     <div>Глобальный бонус: <span id="rebirth-bonus-display" style="color:#00ff66; font-weight:bold;">1.00x</span></div>
                 </div>
-                <p style="font-weight:bold; margin:6px 0; font-size:1.05rem;">Следующая награда: <span id="pending-diamonds" class="diamond-text">0 💎</span></p>
+                <p style="font-weight:bold; margin:6px 0; font-size:1.05rem;">Следующая награда: <span id="pending-diamonds" class="diamond-text">1 💎</span></p>
                 <p style="font-size:0.75rem; color:#ffcc00; margin-bottom:4px;">Требуется денег для следующего ребитха: <span id="rebirth-cost-display" style="font-weight:bold; color:#00ff66;">$10,000</span></p>
                 <button class="rebirth-btn" id="rebirth-btn" onclick="triggerRebirth()">Начать реорганизацию</button>
             </div>
@@ -593,7 +579,6 @@
         let eventTimer = 0;
         let activeEvent = null;
 
-        // МАССИВ СТОИМОСТИ РЕБИТХОВ (10к, 50к, 200к, 500к, 1М, 5М, 10М, 50М...)
         const rebirthCostArray = [10000, 50000, 200000, 500000, 1000000, 5000000, 10000000, 50000000, 200000000, 1000000000];
 
         let audioCtx = null;
@@ -726,7 +711,7 @@
             { id: "default", name: "Стандартная колонка", icon: "⛽", mult: 1, cost: 0 },
             { id: "gold", name: "Золотая VIP-Цистерна", icon: "📀", mult: 2.5, cost: 35 },
             { id: "plasma", name: "Плазменный Экстрактор", icon: "🔮", mult: 6.0, cost: 120 },
-            { id: "diamond_titan", name: "Алмазный Титан", icon: "💎", mult: 15.0, cost: 500 } // НОВЫЙ СКИН ЗА 500 ГЕМОВ
+            { id: "diamond_titan", name: "💎 Алмазный Титан", icon: "💎", mult: 15.0, cost: 500 }
         ];
 
         const investmentPlans = [
@@ -826,13 +811,14 @@
         const getSkinMult = () => skinDefinitions.find(s => s.id === game.currentSkin)?.mult || 1;
         const getRebirthMult = () => 1 + (game.rebirths * 1.25);
         
-        // НОВАЯ ЛОГИКА СТОИМОСТИ РЕБИТХА
         const getRebirthCost = () => {
             if (game.rebirths < rebirthCostArray.length) {
                 return rebirthCostArray[game.rebirths];
             }
             return rebirthCostArray[rebirthCostArray.length - 1] * Math.pow(5, game.rebirths - rebirthCostArray.length + 1);
         };
+
+        const getRebirthReward = () => game.rebirths + 1;
 
         const getBuildingCps = (bState) => {
             let def = buildingDefinitions[bState.id];
@@ -862,10 +848,7 @@
             return Math.max(1, Math.floor(base));
         };
 
-        // НОВАЯ ЛОГИКА НАГРАДЫ ЗА РЕКЛАМУ
-        const getAdRewardMoney = () => {
-            return 500 + (game.rebirths * 1500); // 0 ребитхов=500, 1-й=2000, 2-й=3500, 3-й=5000
-        };
+        const getAdMoneyReward = () => 500 + (game.rebirths * 1500);
 
         function processOfflineProgress() {
             let passed = Math.floor((Date.now() - game.lastSaveTime) / 1000);
@@ -970,10 +953,8 @@
             document.getElementById("rebirth-level-display").textContent = game.rebirths;
             document.getElementById("rebirth-bonus-display").textContent = getRebirthMult().toFixed(2) + "x";
 
-            // Обновляем текст на кнопках рекламы
-            let adMoneyReward = getAdRewardMoney();
+            let adMoneyReward = getAdMoneyReward();
             document.getElementById("ad-money-reward").textContent = format(adMoneyReward);
-            document.getElementById("ad-boost-reward").textContent = format(adMoneyReward * 2);
 
             let btnClick = document.getElementById("btn-u-click");
             if (btnClick) {
@@ -1054,8 +1035,7 @@
             document.getElementById("rebirth-cost-display").textContent = "\$" + format(rCost);
             document.getElementById("rebirth-btn").disabled = game.money < rCost;
 
-            // НОВАЯ ЛОГИКА НАГРАДЫ ЗА РЕБИТХ (1-й = 1 гем, 2-й = 2 гема...)
-            let pending = game.rebirths + 1; 
+            let pending = getRebirthReward();
             if (game.money < rCost) pending = 0;
             document.getElementById("pending-diamonds").textContent = pending + " 💎";
 
@@ -1063,7 +1043,7 @@
             if (banner) {
                 if (activeBoost.time > 0) {
                     banner.style.display = "block";
-                    banner.textContent = `БУСТ: Экстра-Множитель x${activeBoost.mult} (${Math.ceil(activeBoost.time)}с)`;
+                    banner.textContent = `⛽ БУСТ: Добыча бензина x${activeBoost.mult} (${Math.ceil(activeBoost.time)}с)`;
                 } else {
                     banner.style.display = "none";
                 }
@@ -1127,9 +1107,7 @@
         function triggerRebirth() {
             let cost = getRebirthCost();
             if (game.money >= cost) {
-                // Награда за ребитх: 1-й дает 1, 2-й дает 2...
-                let pending = game.rebirths + 1; 
-                
+                let pending = getRebirthReward();
                 game.rebirths++;
                 game.diamonds += pending;
                 game.money = 15;
@@ -1155,19 +1133,16 @@
         function toggleSound() { soundEnabled = !soundEnabled; document.getElementById("btn-sound-toggle").textContent = soundEnabled ? "ВКЛ" : "ВЫКЛ"; }
         function exportProgress() { document.getElementById("backup-string-io").value = btoa(encodeURIComponent(JSON.stringify(game))); alert("Код бэкапа сгенерирован в текстовом полях опций!"); }
 
-        // НОВАЯ ЛОГИКА РЕКЛАМЫ
         function watchAdForMoney() {
-            let reward = getAdRewardMoney();
+            let reward = getAdMoneyReward();
             alert(`📺 Спонсорский ролик просмотрен! Начислено \$${format(reward)}.`);
             game.money += reward;
             updateUI(); save();
         }
 
-        function watchAdForGas() {
-            let reward = getAdRewardMoney() * 2; // Буст х2 = две рекламы
-            alert(`📺 Спонсорский ролик просмотрен! Начислено \$${format(reward)}. Множитель x2 активен на 30 сек.`);
-            game.money += reward;
-            activeBoost = { type: "all", mult: 2, time: 30 };
+        function watchAdForGasBoost() {
+            alert(`📺 Спонсорский ролик просмотрен! Множитель x1.5 к добыче бензина активен на 60 сек.`);
+            activeBoost = { type: "all", mult: 1.5, time: 60 };
             updateUI(); save();
         }
 
@@ -1221,8 +1196,7 @@
             
             gasTicks -= 0.1;
             if (gasTicks <= 0) {
-                // НОВЫЙ РАЗБРОС БИРЖИ (Увеличивается с ребитхами)
-                let maxRate = 50 + (game.rebirths * 25); 
+                let maxRate = 50 + (game.rebirths * 25);
                 gasRate = Math.floor(1 + Math.random() * maxRate);
                 gasTicks = 90;
             }
